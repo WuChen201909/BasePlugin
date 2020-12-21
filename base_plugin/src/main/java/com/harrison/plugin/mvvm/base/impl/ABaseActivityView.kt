@@ -9,7 +9,7 @@ import com.harrison.plugin.mvvm.core.MVVMApplication
 
 open abstract class ABaseActivityView<T : ABaseViewModel> : IView, AppCompatActivity() {
 
-    private lateinit var viewModel: T
+    protected lateinit var viewModel: T
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,8 +18,7 @@ open abstract class ABaseActivityView<T : ABaseViewModel> : IView, AppCompatActi
             ViewModelProvider.AndroidViewModelFactory.getInstance(MVVMApplication.application)
         )
             .get(viewModel.javaClass)
-
-        setContentView(getLayoutId())
+        
         initViewObservable()
     }
 
@@ -33,18 +32,8 @@ open abstract class ABaseActivityView<T : ABaseViewModel> : IView, AppCompatActi
         unBindViewModel()
     }
 
-    override fun bindViewModel() {
-        viewModel.initModel()
-    }
+   
 
-    override fun unBindViewModel() {
-
-    }
-
-    /**
-     *  在Android中使用xml布局使用
-     */
-    abstract fun getLayoutId(): Int
-
+    
 
 }

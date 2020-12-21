@@ -1,229 +1,210 @@
-package com.harrison.plugin.util;
+package com.harrison.plugin.util
 
-import android.text.TextUtils;
-import android.util.Log;
+import android.text.TextUtils
+import android.util.Log
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+object KLog {
+    private var IS_SHOW_LOG = false
+    private const val DEFAULT_MESSAGE = "execute"
+    private val LINE_SEPARATOR = System.getProperty("line.separator")
+    private const val JSON_INDENT = 4
 
+    private const val TAG = "result"
 
-public class KLog {
-
-    private static boolean IS_SHOW_LOG = false;
-
-    private static final String DEFAULT_MESSAGE = "execute";
-    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
-    private static final int JSON_INDENT = 4;
-
-    private static final String TAG = "result";
-
-    private static final int V = 0x1;
-    private static final int D = 0x2;
-    private static final int I = 0x3;
-    private static final int W = 0x4;
-    private static final int E = 0x5;
-    private static final int A = 0x6;
-    private static final int JSON = 0x7;
-
-    public static void init(boolean isShowLog) {
-        IS_SHOW_LOG = isShowLog;
+    private const val V = 0x1
+    private const val D = 0x2
+    private const val I = 0x3
+    private const val W = 0x4
+    private const val E = 0x5
+    private const val A = 0x6
+    private const val JSON = 0x7
+    fun init(isShowLog: Boolean) {
+        IS_SHOW_LOG = isShowLog
     }
 
-    public static void v() {
-        printLog(V, null, DEFAULT_MESSAGE);
+    fun v() {
+        printLog(V, null, DEFAULT_MESSAGE)
     }
 
-    public static void v(Object msg) {
-        printLog(V, null, msg);
+    fun v(msg: Any?) {
+        printLog(V, null, msg)
     }
 
-    public static void v(String tag, String msg) {
-        printLog(V, tag, msg);
+    fun v(tag: String?, msg: String?) {
+        printLog(V, tag, msg)
     }
 
-    public static void d() {
-        printLog(D, null, DEFAULT_MESSAGE);
+    fun d() {
+        printLog(D, null, DEFAULT_MESSAGE)
     }
 
-    public static void d(Object msg) {
-        printLog(D, null, msg);
+    fun d(msg: Any?) {
+        printLog(D, null, msg)
     }
 
-    public static void d(String tag, Object msg) {
-        printLog(D, tag, msg);
+    fun d(tag: String?, msg: Any?) {
+        printLog(D, tag, msg)
     }
 
-    public static void i() {
-        printLog(I, null, DEFAULT_MESSAGE);
+    fun i() {
+        printLog(I, null, DEFAULT_MESSAGE)
     }
 
-    public static void i(Object msg) {
-        printLog(I, null, msg);
+    fun i(msg: Any?) {
+        printLog(I, null, msg)
     }
 
-    public static void i(String tag, Object msg) {
-        printLog(I, tag, msg);
+    fun i(tag: String?, msg: Any?) {
+        printLog(I, tag, msg)
     }
 
-    public static void w() {
-        printLog(W, null, DEFAULT_MESSAGE);
+    fun w() {
+        printLog(W, null, DEFAULT_MESSAGE)
     }
 
-    public static void w(Object msg) {
-        printLog(W, null, msg);
+    fun w(msg: Any?) {
+        printLog(W, null, msg)
     }
 
-    public static void w(String tag, Object msg) {
-        printLog(W, tag, msg);
+    fun w(tag: String?, msg: Any?) {
+        printLog(W, tag, msg)
     }
 
-    public static void e() {
-        printLog(E, null, DEFAULT_MESSAGE);
+    fun e() {
+        printLog(E, null, DEFAULT_MESSAGE)
     }
 
-    public static void e(Object msg) {
-        printLog(E, null, msg);
+    fun e(msg: Any?) {
+        printLog(E, null, msg)
     }
 
-    public static void e(String tag, Object msg) {
-        printLog(E, tag, msg);
+    fun e(tag: String?, msg: Any?) {
+        printLog(E, tag, msg)
     }
 
-    public static void a() {
-        printLog(A, null, DEFAULT_MESSAGE);
+    fun a() {
+        printLog(A, null, DEFAULT_MESSAGE)
     }
 
-    public static void a(Object msg) {
-        printLog(A, null, msg);
+    fun a(msg: Any?) {
+        printLog(A, null, msg)
     }
 
-    public static void a(String tag, Object msg) {
-        printLog(A, tag, msg);
+    fun a(tag: String?, msg: Any?) {
+        printLog(A, tag, msg)
     }
 
-
-    public static void json(String jsonFormat) {
-        printLog(JSON, null, jsonFormat);
+    fun json(jsonFormat: String?) {
+        printLog(JSON, null, jsonFormat)
     }
 
-    public static void json(String tag, String jsonFormat) {
-        printLog(JSON, tag, jsonFormat);
+    fun json(tag: String?, jsonFormat: String?) {
+        printLog(JSON, tag, jsonFormat)
     }
 
-
-    private static void printLog(int type, String tagStr, Object objectMsg) {
-        String msg;
+    private fun printLog(type: Int, tagStr: String?, objectMsg: Any?) {
+        val msg: String
         if (!IS_SHOW_LOG) {
-            return;
+            return
         }
-
-        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-
-        int index = 4;
-        String className = stackTrace[index].getFileName();
-        String methodName = stackTrace[index].getMethodName();
-        int lineNumber = stackTrace[index].getLineNumber();
-
-        String tag = (tagStr == null ? TAG : tagStr);
-        methodName = methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
-
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("[ (").append(className).append(":").append(lineNumber).append(")#").append(methodName).append(" ] ");
-
-        if (objectMsg == null) {
-            msg = "Log with null Object";
-        } else {
-            msg = objectMsg.toString();
-        }
+        val stackTrace = Thread.currentThread().stackTrace
+        val index = 4
+        val className = stackTrace[index].fileName
+        var methodName = stackTrace[index].methodName
+        val lineNumber = stackTrace[index].lineNumber
+        val tag = tagStr ?: TAG
+        methodName = methodName.substring(0, 1).toUpperCase() + methodName.substring(1)
+        val stringBuilder = StringBuilder()
+        stringBuilder.append("[ (").append(className).append(":").append(lineNumber).append(")#")
+            .append(methodName).append(" ] ")
+        msg = objectMsg?.toString() ?: "Log with null Object"
         if (msg != null && type != JSON) {
-            stringBuilder.append(msg);
+            stringBuilder.append(msg)
         }
-
-        String logStr = stringBuilder.toString();
-
-        switch (type) {
-            case V:
-                Log.v(tag, logStr);
-                break;
-            case D:
-                Log.d(tag, logStr);
-                break;
-            case I:
-                Log.i(tag, logStr);
-                break;
-            case W:
-                Log.w(tag, logStr);
-                break;
-            case E:
-                Log.e(tag, logStr);
-                break;
-            case A:
-                Log.wtf(tag, logStr);
-                break;
-            case JSON: {
-
+        val logStr = stringBuilder.toString()
+        when (type) {
+            V -> Log.v(tag, logStr)
+            D -> Log.d(tag, logStr)
+            I -> Log.i(tag, logStr)
+            W -> Log.w(tag, logStr)
+            E -> Log.e(tag, logStr)
+            A -> Log.wtf(tag, logStr)
+            JSON -> {
                 if (TextUtils.isEmpty(msg)) {
-                    Log.d(tag, "Empty or Null json content");
-                    return;
+                    Log.d(tag, "Empty or Null json content")
+                    return
                 }
-
-                String message = null;
-
+                var message: String? = null
                 try {
                     if (msg.startsWith("{")) {
-                        JSONObject jsonObject = new JSONObject(msg);
-                        message = jsonObject.toString(JSON_INDENT);
+                        val jsonObject = JSONObject(msg)
+                        message = jsonObject.toString(JSON_INDENT)
                     } else if (msg.startsWith("[")) {
-                        JSONArray jsonArray = new JSONArray(msg);
-                        message = jsonArray.toString(JSON_INDENT);
+                        val jsonArray = JSONArray(msg)
+                        message = jsonArray.toString(JSON_INDENT)
                     }
-                } catch (JSONException e) {
-                    e(tag, e.getCause().getMessage() + "\n" + msg);
-                    return;
+                } catch (e: JSONException) {
+                    e(tag, """
+     ${e.cause!!.message}
+     $msg
+     """.trimIndent())
+                    return
                 }
-
-                printLine(tag, true);
-                message = logStr + LINE_SEPARATOR + message;
-                String[] lines = message.split(LINE_SEPARATOR);
-                StringBuilder jsonContent = new StringBuilder();
-                for (String line : lines) {
-                    jsonContent.append("║ ").append(line).append(LINE_SEPARATOR);
+                printLine(tag, true)
+                message = logStr + LINE_SEPARATOR + message
+                val lines = message.split(LINE_SEPARATOR).toTypedArray()
+                val jsonContent = StringBuilder()
+                for (line in lines) {
+                    jsonContent.append("║ ").append(line).append(LINE_SEPARATOR)
                 }
-                if (jsonContent.toString().length() > 3200) {
-                    Log.w(tag, "jsonContent.length = " + jsonContent.toString().length());
-                    int chunkCount = jsonContent.toString().length() / 3200;
-                    for (int i = 0; i <= chunkCount; i++) {
-                        int max = 3200 * (i + 1);
-                        if (max >= jsonContent.toString().length()) {
-
-                            Log.w(tag, jsonContent.toString().substring(3200 * i));
-
+                if (jsonContent.toString().length > 3200) {
+                    Log.w(tag, "jsonContent.length = " + jsonContent.toString().length)
+                    val chunkCount = jsonContent.toString().length / 3200
+                    var i = 0
+                    while (i <= chunkCount) {
+                        val max = 3200 * (i + 1)
+                        if (max >= jsonContent.toString().length) {
+                            Log.w(tag, jsonContent.toString().substring(3200 * i))
                         } else {
-
-                            Log.w(tag, jsonContent.toString().substring(3200 * i, max));
-
+                            Log.w(tag, jsonContent.toString().substring(3200 * i, max))
                         }
-
+                        i++
                     }
-
                 } else {
-                    Log.w(tag, jsonContent.toString());
-
+                    Log.w(tag, jsonContent.toString())
                 }
-                printLine(tag, false);
+                printLine(tag, false)
             }
-            break;
         }
-
     }
 
-    private static void printLine(String tag, boolean isTop) {
+    private fun printLine(tag: String, isTop: Boolean) {
         if (isTop) {
-            Log.w(tag, "╔═══════════════════════════════════════════════════════════════════════════════════════");
+            Log.w(tag,
+                "╔═══════════════════════════════════════════════════════════════════════════════════════")
         } else {
-            Log.w(tag, "╚═══════════════════════════════════════════════════════════════════════════════════════");
+            Log.w(tag,
+                "╚═══════════════════════════════════════════════════════════════════════════════════════")
         }
     }
 
+    /**
+     * 打印异常堆栈信息
+     * @param throwable
+     */
+    fun printException(throwable: Throwable) {
+        var stackInfo: StringBuffer = StringBuffer()
+        for (item in throwable.stackTrace) {
+            val className: String = item.fileName ?: continue
+            var methodName: String = item.methodName
+            val lineNumber: Int = item.lineNumber
+            methodName = methodName.substring(0, 1).toUpperCase() + methodName.substring(1)
+            stackInfo.append("[(").append(className).append(":").append(lineNumber)
+                .append(")#").append(methodName).append("] \n")
+        }
+        e("Throws an exception with message: \n${throwable.message} \n${stackInfo.toString()}")
+    }
 }

@@ -21,4 +21,10 @@
         android:text="Jum To Second Activity"
         ></Button>
 
+    <Button
+        android:id="@+id/button_start_request"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="开始请求"></Button>
+
 </LinearLayout>

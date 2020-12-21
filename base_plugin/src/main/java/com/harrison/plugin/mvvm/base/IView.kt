@@ -6,6 +6,11 @@ package com.harrison.plugin.mvvm.base
 interface IView {
 
     /**
+     * 初始化视图
+     */
+    fun initView()
+
+    /**
      * 初始化观察者
      *  1、响应新数据和初始数据
      */

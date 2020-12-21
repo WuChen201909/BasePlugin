@@ -7,10 +7,6 @@ import androidx.lifecycle.ViewModel
  */
 interface IViewModel {
 
-    /**
-     * 1、初始化Model
-     * 2、向View发送数据
-     */
-    fun initModel()
+
 
 }

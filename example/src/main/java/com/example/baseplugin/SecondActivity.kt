@@ -4,6 +4,9 @@ import com.harrison.plugin.mvvm.base.impl.ABaseActivityView
 import com.harrison.plugin.mvvm.base.impl.ABaseViewModel
 
 class SecondActivity : ABaseActivityView<ABaseViewModel>() {
+    override fun initView() {
+
+    }
 
     override fun initViewObservable() {
 
@@ -13,12 +16,8 @@ class SecondActivity : ABaseActivityView<ABaseViewModel>() {
 
     }
 
-    override fun getLayoutId(): Int {
-        return R.layout.activity_second
-    }
+    override fun unBindViewModel() {
 
-    override fun initViewModel(): Class<ABaseViewModel> {
-        return ABaseViewModel::class.java
     }
 
 

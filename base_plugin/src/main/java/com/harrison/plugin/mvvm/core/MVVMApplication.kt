@@ -29,7 +29,7 @@ open class MVVMApplication: Application() {
                 override fun onActivityCreated(p0: Activity, p1: Bundle?) {
 
                 }
-
+                
                 override fun onActivityStarted(p0: Activity) {
                 }
 

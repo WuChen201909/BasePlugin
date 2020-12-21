@@ -23,27 +23,18 @@ open abstract class ABaseFragmentView<T : ABaseViewModel> : IView, Fragment() {
             ViewModelProvider.AndroidViewModelFactory.getInstance(MVVMApplication.application)
         )
             .get(viewModel.javaClass)
+        initViewObservable()
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-    override fun initViewObservable() {
-
+    override fun onResume() {
+        super.onResume()
+        bindViewModel();
     }
 
-    override fun bindViewModel() {
+    override fun onStop() {
+        super.onStop()
+        unBindViewModel()
     }
-
-    override fun unBindViewModel() {
-    }
-
-    /**
-     *  在Android中使用xml布局使用
-     */
-    abstract fun getLayoutId(): Int
-
-    /**
-     * 在Android 创建ViewModel使用
-     */
-    abstract fun initViewModel(): Class<T>
-
+    
 }

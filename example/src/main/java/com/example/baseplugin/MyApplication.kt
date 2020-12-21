@@ -1,9 +1,9 @@
 package com.example.baseplugin
 
-import com.harrison.plugin.mvvm.core.BaseApplication
+import com.harrison.plugin.mvvm.core.MVVMApplication
 import com.harrison.plugin.util.KLog
 
-class MyApplication : BaseApplication() {
+class MyApplication : MVVMApplication() {
 
     override fun onCreate() {
         super.onCreate()

@@ -1,7 +1,7 @@
 package com.example.baseplugin
 
-import com.harrison.plugin.mvvm.base.ABaseActivityView
-import com.harrison.plugin.mvvm.base.ABaseViewModel
+import com.harrison.plugin.mvvm.base.impl.ABaseActivityView
+import com.harrison.plugin.mvvm.base.impl.ABaseViewModel
 
 class SecondActivity : ABaseActivityView<ABaseViewModel>() {
 

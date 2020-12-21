@@ -7,24 +7,34 @@ import android.os.Bundle
 /**
  * 用于视图的堆栈管理
  */
-open class BaseApplication: Application() {
+open class MVVMApplication: Application() {
+    
+
+
+    companion object{
+       lateinit var application:Application
+       var topActivity:Activity? = null
+    }
 
     override fun onCreate() {
         super.onCreate()
+        application = this
         initActivity()
     }
+
 
     private fun initActivity(){
         registerActivityLifecycleCallbacks(
             object :ActivityLifecycleCallbacks{
                 override fun onActivityCreated(p0: Activity, p1: Bundle?) {
-                    AViewProvider.pushActivity(p0)
+
                 }
 
                 override fun onActivityStarted(p0: Activity) {
                 }
 
                 override fun onActivityResumed(p0: Activity) {
+                    topActivity = p0
                 }
 
                 override fun onActivityPaused(p0: Activity) {
@@ -37,9 +47,8 @@ open class BaseApplication: Application() {
                 }
 
                 override fun onActivityDestroyed(p0: Activity) {
-                    AViewProvider.popActivity(p0)
+                    
                 }
-
             }
         )
     }

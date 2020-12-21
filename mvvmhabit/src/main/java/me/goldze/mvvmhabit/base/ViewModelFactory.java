@@ -46,7 +46,7 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
             String className = modelClass.getCanonicalName();
             Class<?> classViewModel = Class.forName(className);
             Constructor<?> cons = classViewModel.getConstructor(Application.class);
-            ViewModel viewModel = (ViewModel) cons.newInstance(mApplication);
+            ViewModel viewModel = (ViewModel)cons.newInstance(mApplication);
             return (T) viewModel;
         } catch (ClassNotFoundException e) {
             e.printStackTrace();

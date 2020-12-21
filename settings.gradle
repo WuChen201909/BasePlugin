@@ -1,0 +1,13 @@
+
+//当前项目使用到的Model
+include ':mvvm_example'
+include ':base_plugin'
+include ':example'
+include ':mvvmhabit'
+
+//将当前项目文件以外的Model倒入到当前项目中
+//include ':base_plugin'
+//project(':base_plugin').projectDir = new File("/Users/aaa/WorkRoom/WorkRoom/Android/Test/TestModel/testlibrary")
+
+// 表示项目名
+rootProject.name = "BasePlugin"

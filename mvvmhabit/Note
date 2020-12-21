@@ -1,0 +1,8 @@
+retrofit+okhttp+rxJava负责网络请求；
+gson负责解析json数据；
+glide负责加载图片；
+rxlifecycle负责管理view的生命周期；与网络请求共存亡；
+rxbinding结合databinding扩展UI事件；
+rxpermissions负责Android 6.0权限申请；
+
+material-dialogs一个漂亮的、流畅的、可定制的material design风格的对话框。

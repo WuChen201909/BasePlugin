@@ -1,9 +1,15 @@
 package com.harrison.plugin.http;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
+
+import androidx.core.app.ActivityCompat;
+
+import com.harrison.plugin.util.KLog;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -48,9 +54,9 @@ public class NetworkUtil {
     public static String getLocalIpAddress() {
         String ret = "";
         try {
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
                 NetworkInterface intf = en.nextElement();
-                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
                     InetAddress inetAddress = enumIpAddr.nextElement();
                     if (!inetAddress.isLoopbackAddress()) {
                         ret = inetAddress.getHostAddress().toString();
@@ -173,6 +179,10 @@ public class NetworkUtil {
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         TelephonyManager mgrTel = (TelephonyManager) context
                 .getSystemService(Context.TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            KLog.INSTANCE.e("没有权限");
+            return false;
+        }
         return ((mgrConn.getActiveNetworkInfo() != null && mgrConn
                 .getActiveNetworkInfo().getState() == NetworkInfo.State.CONNECTED) || mgrTel
                 .getNetworkType() == TelephonyManager.NETWORK_TYPE_UMTS);

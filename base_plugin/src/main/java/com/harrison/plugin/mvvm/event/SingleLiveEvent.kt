@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.harrison.plugin.mvvm.core
+package com.harrison.plugin.mvvm.event
 
 import android.util.Log
 import androidx.annotation.MainThread
@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  *
  * Note that only one observer is going to be notified of changes.
  */
-class SingleLiveEvent<T> : MutableLiveData<T?>() {
+open class SingleLiveEvent<T> : MutableLiveData<T?>() {
     private val mPending = AtomicBoolean(false)
     @MainThread
     override fun observe(owner: LifecycleOwner, observer: Observer<in T?>) {

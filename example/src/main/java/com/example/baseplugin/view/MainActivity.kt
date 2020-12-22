@@ -4,6 +4,7 @@ import android.view.View
 import com.example.baseplugin.R
 import com.example.baseplugin.viewmodel.MainViewModel
 import com.harrison.plugin.mvvm.base.impl.ABaseActivityView
+import com.harrison.plugin.util.KLog
 
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -18,8 +19,8 @@ class MainActivity : ABaseActivityView<MainViewModel>(){
     }
 
     override fun initViewObservable() {
-        viewModel.singleLiveEvent.observe(this){
-
+        viewModel.httpLiveEvent.observe(this){ state, value ->
+            KLog.i("网络请求状态 $state  $value")
         }
     }
 
@@ -30,8 +31,6 @@ class MainActivity : ABaseActivityView<MainViewModel>(){
     override fun unBindViewModel() {
 
     }
-
-
 
 
     private var onClickListener = View.OnClickListener {

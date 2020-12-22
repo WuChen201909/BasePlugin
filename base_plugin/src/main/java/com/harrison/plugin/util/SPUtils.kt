@@ -1,72 +1,39 @@
-package com.harrison.plugin.util;
+package com.harrison.plugin.util
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import androidx.annotation.NonNull;
-
+import android.content.Context
+import android.content.SharedPreferences
+import com.harrison.plugin.mvvm.core.MVVMApplication
+import java.util.*
 
 /**
  * Created by goldze on 2017/5/14.
  * SharedPreferences工具类
  */
-public final class SPUtils {
+class SPUtils private constructor(spName: String) {
 
-    private static Map<String, SPUtils> sSPMap = new HashMap<>();
-    private SharedPreferences sp;
+    private val sp: SharedPreferences
 
-    /**
-     * 获取SP实例
-     *
-     * @return {@link SPUtils}
-     */
-    public static SPUtils getInstance() {
-        return getInstance("");
+    init {
+        sp = MVVMApplication.application.getSharedPreferences(spName, Context.MODE_PRIVATE)
     }
-
-    /**
-     * 获取SP实例
-     *
-     * @param spName sp名
-     * @return {@link SPUtils}
-     */
-    public static SPUtils getInstance(String spName) {
-        if (isSpace(spName)) spName = "spUtils";
-        SPUtils sp = sSPMap.get(spName);
-        if (sp == null) {
-            sp = new SPUtils(spName);
-            sSPMap.put(spName, sp);
-        }
-        return sp;
-    }
-
-    private SPUtils(final String spName) {
-        sp = Utils.getContext().getSharedPreferences(spName, Context.MODE_PRIVATE);
-    }
-
     /**
      * SP中写入String
      *
      * @param key 键
      * @param value 值
      */
-    public void put(@NonNull final String key, @NonNull final String value) {
-        sp.edit().putString(key, value).apply();
+    fun put(key: String, value: String) {
+        sp.edit().putString(key, value).apply()
     }
 
     /**
      * SP中读取String
      *
      * @param key 键
-     * @return 存在返回对应值，不存在返回默认值{@code ""}
+     * @return 存在返回对应值，不存在返回默认值`""`
      */
-    public String getString(@NonNull final String key) {
-        return getString(key, "");
+    fun getString(key: String): String? {
+        return getString(key, "")
     }
 
     /**
@@ -74,10 +41,10 @@ public final class SPUtils {
      *
      * @param key 键
      * @param defaultValue 默认值
-     * @return 存在返回对应值，不存在返回默认值{@code defaultValue}
+     * @return 存在返回对应值，不存在返回默认值`defaultValue`
      */
-    public String getString(@NonNull final String key, @NonNull final String defaultValue) {
-        return sp.getString(key, defaultValue);
+    fun getString(key: String, defaultValue: String): String? {
+        return sp.getString(key, defaultValue)
     }
 
     /**
@@ -86,8 +53,8 @@ public final class SPUtils {
      * @param key 键
      * @param value 值
      */
-    public void put(@NonNull final String key, final int value) {
-        sp.edit().putInt(key, value).apply();
+    fun put(key: String, value: Int) {
+        sp.edit().putInt(key, value).apply()
     }
 
     /**
@@ -96,8 +63,8 @@ public final class SPUtils {
      * @param key 键
      * @return 存在返回对应值，不存在返回默认值-1
      */
-    public int getInt(@NonNull final String key) {
-        return getInt(key, -1);
+    fun getInt(key: String): Int {
+        return getInt(key, -1)
     }
 
     /**
@@ -105,10 +72,10 @@ public final class SPUtils {
      *
      * @param key 键
      * @param defaultValue 默认值
-     * @return 存在返回对应值，不存在返回默认值{@code defaultValue}
+     * @return 存在返回对应值，不存在返回默认值`defaultValue`
      */
-    public int getInt(@NonNull final String key, final int defaultValue) {
-        return sp.getInt(key, defaultValue);
+    fun getInt(key: String, defaultValue: Int): Int {
+        return sp.getInt(key, defaultValue)
     }
 
     /**
@@ -117,8 +84,8 @@ public final class SPUtils {
      * @param key 键
      * @param value 值
      */
-    public void put(@NonNull final String key, final long value) {
-        sp.edit().putLong(key, value).apply();
+    fun put(key: String, value: Long) {
+        sp.edit().putLong(key, value).apply()
     }
 
     /**
@@ -127,8 +94,8 @@ public final class SPUtils {
      * @param key 键
      * @return 存在返回对应值，不存在返回默认值-1
      */
-    public long getLong(@NonNull final String key) {
-        return getLong(key, -1L);
+    fun getLong(key: String): Long {
+        return getLong(key, -1L)
     }
 
     /**
@@ -136,10 +103,10 @@ public final class SPUtils {
      *
      * @param key 键
      * @param defaultValue 默认值
-     * @return 存在返回对应值，不存在返回默认值{@code defaultValue}
+     * @return 存在返回对应值，不存在返回默认值`defaultValue`
      */
-    public long getLong(@NonNull final String key, final long defaultValue) {
-        return sp.getLong(key, defaultValue);
+    fun getLong(key: String, defaultValue: Long): Long {
+        return sp.getLong(key, defaultValue)
     }
 
     /**
@@ -148,8 +115,8 @@ public final class SPUtils {
      * @param key 键
      * @param value 值
      */
-    public void put(@NonNull final String key, final float value) {
-        sp.edit().putFloat(key, value).apply();
+    fun put(key: String, value: Float) {
+        sp.edit().putFloat(key, value).apply()
     }
 
     /**
@@ -158,8 +125,8 @@ public final class SPUtils {
      * @param key 键
      * @return 存在返回对应值，不存在返回默认值-1
      */
-    public float getFloat(@NonNull final String key) {
-        return getFloat(key, -1f);
+    fun getFloat(key: String): Float {
+        return getFloat(key, -1f)
     }
 
     /**
@@ -167,10 +134,10 @@ public final class SPUtils {
      *
      * @param key 键
      * @param defaultValue 默认值
-     * @return 存在返回对应值，不存在返回默认值{@code defaultValue}
+     * @return 存在返回对应值，不存在返回默认值`defaultValue`
      */
-    public float getFloat(@NonNull final String key, final float defaultValue) {
-        return sp.getFloat(key, defaultValue);
+    fun getFloat(key: String, defaultValue: Float): Float {
+        return sp.getFloat(key, defaultValue)
     }
 
     /**
@@ -179,18 +146,18 @@ public final class SPUtils {
      * @param key 键
      * @param value 值
      */
-    public void put(@NonNull final String key, final boolean value) {
-        sp.edit().putBoolean(key, value).apply();
+    fun put(key: String, value: Boolean) {
+        sp.edit().putBoolean(key, value).apply()
     }
 
     /**
      * SP中读取boolean
      *
      * @param key 键
-     * @return 存在返回对应值，不存在返回默认值{@code false}
+     * @return 存在返回对应值，不存在返回默认值`false`
      */
-    public boolean getBoolean(@NonNull final String key) {
-        return getBoolean(key, false);
+    fun getBoolean(key: String): Boolean {
+        return getBoolean(key, false)
     }
 
     /**
@@ -198,10 +165,10 @@ public final class SPUtils {
      *
      * @param key 键
      * @param defaultValue 默认值
-     * @return 存在返回对应值，不存在返回默认值{@code defaultValue}
+     * @return 存在返回对应值，不存在返回默认值`defaultValue`
      */
-    public boolean getBoolean(@NonNull final String key, final boolean defaultValue) {
-        return sp.getBoolean(key, defaultValue);
+    fun getBoolean(key: String, defaultValue: Boolean): Boolean {
+        return sp.getBoolean(key, defaultValue)
     }
 
     /**
@@ -210,18 +177,18 @@ public final class SPUtils {
      * @param key 键
      * @param values 值
      */
-    public void put(@NonNull final String key, @NonNull final Set<String> values) {
-        sp.edit().putStringSet(key, values).apply();
+    fun put(key: String, values: Set<String?>) {
+        sp.edit().putStringSet(key, values).apply()
     }
 
     /**
      * SP中读取StringSet
      *
      * @param key 键
-     * @return 存在返回对应值，不存在返回默认值{@code Collections.<String>emptySet()}
+     * @return 存在返回对应值，不存在返回默认值`Collections.<String>emptySet()`
      */
-    public Set<String> getStringSet(@NonNull final String key) {
-        return getStringSet(key, Collections.<String>emptySet());
+    fun getStringSet(key: String): Set<String>? {
+        return getStringSet(key, emptySet<String>())
     }
 
     /**
@@ -229,10 +196,10 @@ public final class SPUtils {
      *
      * @param key 键
      * @param defaultValue 默认值
-     * @return 存在返回对应值，不存在返回默认值{@code defaultValue}
+     * @return 存在返回对应值，不存在返回默认值`defaultValue`
      */
-    public Set<String> getStringSet(@NonNull final String key, @NonNull final Set<String> defaultValue) {
-        return sp.getStringSet(key, defaultValue);
+    fun getStringSet(key: String, defaultValue: Set<String?>): Set<String>? {
+        return sp.getStringSet(key, defaultValue)
     }
 
     /**
@@ -240,18 +207,17 @@ public final class SPUtils {
      *
      * @return Map对象
      */
-    public Map<String, ?> getAll() {
-        return sp.getAll();
-    }
+    val all: Map<String, *>
+        get() = sp.all
 
     /**
      * SP中是否存在该key
      *
      * @param key 键
-     * @return {@code true}: 存在<br>{@code false}: 不存在
+     * @return `true`: 存在<br></br>`false`: 不存在
      */
-    public boolean contains(@NonNull final String key) {
-        return sp.contains(key);
+    operator fun contains(key: String): Boolean {
+        return sp.contains(key)
     }
 
     /**
@@ -259,24 +225,58 @@ public final class SPUtils {
      *
      * @param key 键
      */
-    public void remove(@NonNull final String key) {
-        sp.edit().remove(key).apply();
+    fun remove(key: String) {
+        sp.edit().remove(key).apply()
     }
 
     /**
      * SP中清除所有数据
      */
-    public void clear() {
-        sp.edit().clear().apply();
+    fun clear() {
+        sp.edit().clear().apply()
     }
 
-    private static boolean isSpace(final String s) {
-        if (s == null) return true;
-        for (int i = 0, len = s.length(); i < len; ++i) {
-            if (!Character.isWhitespace(s.charAt(i))) {
-                return false;
+    companion object {
+        private val sSPMap: MutableMap<String, SPUtils> = HashMap()
+
+        /**
+         * 获取SP实例
+         *
+         * @return [SPUtils]
+         */
+        val instance: SPUtils
+            get() = getInstance("")
+
+        /**
+         * 获取SP实例
+         *
+         * @param spName sp名
+         * @return [SPUtils]
+         */
+        fun getInstance(spName: String): SPUtils {
+            var spName = spName
+            if (isSpace(spName)) spName = "spUtils"
+            var sp = sSPMap[spName]
+            if (sp == null) {
+                sp = SPUtils(spName)
+                sSPMap[spName] = sp
             }
+            return sp
         }
-        return true;
+
+        private fun isSpace(s: String?): Boolean {
+            if (s == null) return true
+            var i = 0
+            val len = s.length
+            while (i < len) {
+                if (!Character.isWhitespace(s[i])) {
+                    return false
+                }
+                ++i
+            }
+            return true
+        }
     }
+
+
 }

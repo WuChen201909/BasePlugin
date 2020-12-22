@@ -42,7 +42,7 @@ object  RetrofitManager {
             configRetrofit(builder)
             builder.client(okHttpBuilder.build())
 
-            apiService = builder!!.build().create(ApiServer::class.java)
+            apiService = builder.build().create(ApiServer::class.java)
         }
         return apiService!!
     }

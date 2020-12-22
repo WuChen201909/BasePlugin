@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.baseplugin"
-        minSdkVersion 16
+        minSdkVersion 18
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -38,9 +38,6 @@ android {
         jvmTarget = '1.8'
     }
 
-    dataBinding {
-        enabled true
-    }
 }
 
 dependencies {

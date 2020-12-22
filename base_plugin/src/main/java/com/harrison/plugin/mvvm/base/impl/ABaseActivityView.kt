@@ -17,8 +17,8 @@ open abstract class ABaseActivityView<T : ABaseViewModel> : IView, AppCompatActi
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(MVVMApplication.application)
         )
-            .get(viewModel.javaClass)
-        
+            .get(getViewModelClass())
+        initView()
         initViewObservable()
     }
 
@@ -32,7 +32,7 @@ open abstract class ABaseActivityView<T : ABaseViewModel> : IView, AppCompatActi
         unBindViewModel()
     }
 
-   
+    abstract  fun getViewModelClass():Class<T>
 
     
 

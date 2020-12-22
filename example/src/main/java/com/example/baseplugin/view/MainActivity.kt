@@ -1,14 +1,11 @@
-package com.example.baseplugin
+package com.example.baseplugin.view
 
-import android.app.Activity
-import android.os.Bundle
-import android.util.Log
 import android.view.View
+import com.example.baseplugin.R
+import com.example.baseplugin.viewmodel.MainViewModel
 import com.harrison.plugin.mvvm.base.impl.ABaseActivityView
 
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.*
-import java.lang.Exception
 
 class MainActivity : ABaseActivityView<MainViewModel>(){
 
@@ -21,9 +18,9 @@ class MainActivity : ABaseActivityView<MainViewModel>(){
     }
 
     override fun initViewObservable() {
-        viewModel.launch(
+        viewModel.singleLiveEvent.observe(this){
 
-        );
+        }
     }
 
     override fun bindViewModel() {
@@ -47,10 +44,14 @@ class MainActivity : ABaseActivityView<MainViewModel>(){
 
             }
             R.id.button_start_request ->{
-
+                viewModel.exeTest()
 
             }
         }
+    }
+
+    override fun getViewModelClass(): Class<MainViewModel> {
+        return MainViewModel::class.java
     }
 
 }

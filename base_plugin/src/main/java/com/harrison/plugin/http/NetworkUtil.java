@@ -13,6 +13,9 @@ import java.net.SocketException;
 import java.net.URL;
 import java.util.Enumeration;
 
+/**
+ * 网络状况检测工具
+ */
 public class NetworkUtil {
     public static String url = "http://www.baidu.com";
     public static int NET_CNNT_BAIDU_OK = 1; // NetworkAvailable

@@ -23,6 +23,7 @@ open abstract class ABaseFragmentView<T : ABaseViewModel> : IView, Fragment() {
             ViewModelProvider.AndroidViewModelFactory.getInstance(MVVMApplication.application)
         )
             .get(viewModel.javaClass)
+        initView()
         initViewObservable()
         return super.onCreateView(inflater, container, savedInstanceState)
     }

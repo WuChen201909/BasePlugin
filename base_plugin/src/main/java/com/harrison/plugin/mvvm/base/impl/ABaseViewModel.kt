@@ -19,14 +19,15 @@ open class ABaseViewModel(application: Application) : IViewModel,
 
 
     fun launch(block: suspend CoroutineScope.() -> Unit,error: (error:String) -> Unit){
-
+        
         var exceptionHandler = CoroutineExceptionHandler {
                 _ : CoroutineContext, throwable: Throwable ->
             error(throwable.message.toString())
             KLog.printException(throwable)
         }
-        launch(exceptionHandler){
 
+        launch(exceptionHandler){
+            block()
         }
     }
 

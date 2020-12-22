@@ -106,7 +106,6 @@ object KLog {
     }
 
     private fun printLog(type: Int, tagStr: String?, objectMsg: Any?) {
-        val msg: String
         if (!IS_SHOW_LOG) {
             return
         }
@@ -120,7 +119,7 @@ object KLog {
         val stringBuilder = StringBuilder()
         stringBuilder.append("[ (").append(className).append(":").append(lineNumber).append(")#")
             .append(methodName).append(" ] ")
-        msg = objectMsg?.toString() ?: "Log with null Object"
+        val msg: String = objectMsg?.toString() ?: "Log with null Object"
         if (msg != null && type != JSON) {
             stringBuilder.append(msg)
         }
@@ -196,15 +195,19 @@ object KLog {
      * @param throwable
      */
     fun printException(throwable: Throwable) {
-        var stackInfo: StringBuffer = StringBuffer()
+        Log.e(TAG,
+            "Throws an exception with message: [${throwable.message}] ")
         for (item in throwable.stackTrace) {
-            val className: String = item.fileName ?: continue
+            var stackInfo = StringBuffer()
+            val fileName: String = item.fileName ?: continue
             var methodName: String = item.methodName
             val lineNumber: Int = item.lineNumber
             methodName = methodName.substring(0, 1).toUpperCase() + methodName.substring(1)
-            stackInfo.append("[(").append(className).append(":").append(lineNumber)
-                .append(")#").append(methodName).append("] \n")
+            stackInfo.append("[ (").append(fileName).append(":").append(lineNumber).append(")#")
+                .append(methodName).append(" ] \n")
+            Log.e(TAG, stackInfo.toString())
         }
-        e("Throws an exception with message: \n${throwable.message} \n${stackInfo.toString()}")
     }
+
+
 }

@@ -20,7 +20,6 @@ import okhttp3.internal.platform.Platform;
 /**
  * @author ihsan on 09/02/2017.
  */
-
 public class LoggingInterceptor implements Interceptor {
 
     private boolean isDebug;

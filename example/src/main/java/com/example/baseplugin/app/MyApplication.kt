@@ -1,4 +1,4 @@
-package com.example.baseplugin
+package com.example.baseplugin.app
 
 import com.harrison.plugin.mvvm.core.MVVMApplication
 import com.harrison.plugin.util.KLog

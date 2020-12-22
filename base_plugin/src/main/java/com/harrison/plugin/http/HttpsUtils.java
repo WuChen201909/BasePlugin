@@ -35,6 +35,9 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
+/**
+ * http证书工具
+ */
 public class HttpsUtils {
 
     public static class SSLParams {

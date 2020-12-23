@@ -22,10 +22,11 @@ open abstract class ABaseActivityView<T : ABaseViewModel> : IView, AppCompatActi
         initViewObservable()
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         bindViewModel()
     }
+
 
     override fun onStop() {
         super.onStop()

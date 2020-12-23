@@ -1,7 +1,7 @@
 
 //当前项目使用到的Model
 include ':mvvm_example'
-include ':base_plugin'
+include ':base_code'
 include ':example'
 include ':mvvmhabit'
 

@@ -28,8 +28,8 @@ open abstract class ABaseFragmentView<T : ABaseViewModel> : IView, Fragment() {
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         bindViewModel();
     }
 

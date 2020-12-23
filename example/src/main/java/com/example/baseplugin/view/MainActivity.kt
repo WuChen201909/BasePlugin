@@ -32,7 +32,6 @@ class MainActivity : ABaseActivityView<MainViewModel>(){
 
     }
 
-
     private var onClickListener = View.OnClickListener {
 
 

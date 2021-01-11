@@ -1,4 +1,4 @@
-package com.harrison.plugin.util
+package com.harrison.plugin.util.developer
 
 import android.text.TextUtils
 import android.util.Log
@@ -6,13 +6,13 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
-object KLog {
+object LogUtils {
     private var IS_SHOW_LOG = false
     private const val DEFAULT_MESSAGE = "execute"
     private val LINE_SEPARATOR = System.getProperty("line.separator")
     private const val JSON_INDENT = 4
 
-    private const val TAG = "result"
+    private var TAG = "result"
 
     private const val V = 0x1
     private const val D = 0x2
@@ -21,8 +21,10 @@ object KLog {
     private const val E = 0x5
     private const val A = 0x6
     private const val JSON = 0x7
-    fun init(isShowLog: Boolean) {
+
+    fun init(isShowLog: Boolean,debugTag:String) {
         IS_SHOW_LOG = isShowLog
+        TAG = debugTag
     }
 
     fun v() {
@@ -109,21 +111,28 @@ object KLog {
         if (!IS_SHOW_LOG) {
             return
         }
+        //初始配置内容
         val stackTrace = Thread.currentThread().stackTrace
         val index = 4
+        val tag = tagStr ?: TAG
+
+        //用于显示堆栈信息
         val className = stackTrace[index].fileName
         var methodName = stackTrace[index].methodName
         val lineNumber = stackTrace[index].lineNumber
-        val tag = tagStr ?: TAG
         methodName = methodName.substring(0, 1).toUpperCase() + methodName.substring(1)
         val stringBuilder = StringBuilder()
         stringBuilder.append("[ (").append(className).append(":").append(lineNumber).append(")#")
             .append(methodName).append(" ] ")
+
+        //处理显示消息
         val msg: String = objectMsg?.toString() ?: "Log with null Object"
         if (msg != null && type != JSON) {
             stringBuilder.append(msg)
         }
         val logStr = stringBuilder.toString()
+
+        //输出消息
         when (type) {
             V -> Log.v(tag, logStr)
             D -> Log.d(tag, logStr)
@@ -131,7 +140,7 @@ object KLog {
             W -> Log.w(tag, logStr)
             E -> Log.e(tag, logStr)
             A -> Log.wtf(tag, logStr)
-            JSON -> {
+            JSON -> {  //Json 数据的格式化打印
                 if (TextUtils.isEmpty(msg)) {
                     Log.d(tag, "Empty or Null json content")
                     return
@@ -189,6 +198,13 @@ object KLog {
                 "╚═══════════════════════════════════════════════════════════════════════════════════════")
         }
     }
+
+    /**
+     * ===========================================================================
+     *  扩展功能
+     * ===========================================================================
+     */
+
 
     /**
      * 打印异常堆栈信息

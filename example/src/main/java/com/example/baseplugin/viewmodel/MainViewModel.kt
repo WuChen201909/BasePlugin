@@ -3,7 +3,7 @@ package com.example.baseplugin.viewmodel
 import android.app.Application
 import android.util.Log
 import com.example.baseplugin.http.RetrofitManager
-import com.harrison.plugin.constant.HttpResponseCode
+import com.harrison.plugin.util.constant.HttpResponseCode
 import com.harrison.plugin.mvvm.base.impl.ABaseViewModel
 import com.harrison.plugin.mvvm.event.HttpLiveEvent
 

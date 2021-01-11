@@ -1,4 +1,4 @@
-package com.harrison.plugin.util;
+package com.harrison.plugin.util.io;
 
 import java.io.Closeable;
 import java.io.IOException;

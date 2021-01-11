@@ -1,4 +1,4 @@
-package com.harrison.plugin.util;
+package com.harrison.plugin.util.io;
 
 /**
  * Created by goldze on 2017/5/14.

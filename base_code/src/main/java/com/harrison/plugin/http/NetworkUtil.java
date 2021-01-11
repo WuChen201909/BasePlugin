@@ -9,7 +9,7 @@ import android.telephony.TelephonyManager;
 
 import androidx.core.app.ActivityCompat;
 
-import com.harrison.plugin.util.KLog;
+import com.harrison.plugin.util.developer.LogUtils;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -180,7 +180,7 @@ public class NetworkUtil {
         TelephonyManager mgrTel = (TelephonyManager) context
                 .getSystemService(Context.TELEPHONY_SERVICE);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            KLog.INSTANCE.e("没有权限");
+            LogUtils.INSTANCE.e("没有权限");
             return false;
         }
         return ((mgrConn.getActiveNetworkInfo() != null && mgrConn

@@ -1,4 +1,4 @@
-package com.harrison.plugin.util;
+package com.harrison.plugin.util.io;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
@@ -10,8 +10,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
-import com.harrison.plugin.constant.MemoryConstants;
-import com.harrison.plugin.constant.TimeConstants;
+import com.harrison.plugin.util.constant.MemoryConstants;
+import com.harrison.plugin.util.constant.TimeConstants;
 import com.harrison.plugin.mvvm.core.MVVMApplication;
 
 import java.io.ByteArrayInputStream;

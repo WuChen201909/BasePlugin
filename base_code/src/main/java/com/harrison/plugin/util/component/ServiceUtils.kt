@@ -1,4 +1,4 @@
-package com.harrison.plugin.util
+package com.harrison.plugin.util.component
 
 import android.content.Context
 import android.provider.Settings
@@ -6,7 +6,6 @@ import android.text.TextUtils
 import android.util.Log
 
 object ServiceUtils {
-
 
     /**
      * 检查系统设置：是否开启辅助服务

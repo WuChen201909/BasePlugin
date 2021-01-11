@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.harrison.plugin.crash;
+package com.harrison.plugin.util.developer.crash;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;

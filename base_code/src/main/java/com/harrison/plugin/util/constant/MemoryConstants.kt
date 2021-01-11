@@ -1,4 +1,4 @@
-package com.harrison.plugin.constant
+package com.harrison.plugin.util.constant
 
 import androidx.annotation.IntDef
 import java.lang.annotation.Retention

@@ -3,7 +3,7 @@ package com.harrison.plugin.mvvm.event
 import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.LifecycleOwner
-import com.harrison.plugin.constant.HttpResponseCode
+import com.harrison.plugin.util.constant.HttpResponseCode
 
 /**
  * 专用于网络请求事件处理

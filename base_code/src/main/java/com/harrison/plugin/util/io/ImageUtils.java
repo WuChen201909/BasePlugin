@@ -1,4 +1,4 @@
-package com.harrison.plugin.util;
+package com.harrison.plugin.util.io;
 
 import android.app.Activity;
 import android.content.ContentResolver;

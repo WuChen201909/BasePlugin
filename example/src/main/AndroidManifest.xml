@@ -19,7 +19,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".model.SecondActivity"></activity>
+        <activity android:name=".view.SecondActivity"></activity>
     </application>
 
 </manifest>

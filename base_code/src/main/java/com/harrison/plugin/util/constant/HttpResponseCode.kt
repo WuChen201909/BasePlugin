@@ -1,4 +1,4 @@
-package com.harrison.plugin.constant
+package com.harrison.plugin.util.constant
 
 /**
  * Http 网络请求响应码

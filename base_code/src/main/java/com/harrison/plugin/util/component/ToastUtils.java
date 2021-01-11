@@ -1,4 +1,4 @@
-package com.harrison.plugin.util;
+package com.harrison.plugin.util.component;
 
 import android.content.Context;
 import android.os.Handler;

@@ -1,4 +1,4 @@
-package com.harrison.plugin.constant
+package com.harrison.plugin.util.constant
 
 /**
  * Created by goldze on 2017/5/14.

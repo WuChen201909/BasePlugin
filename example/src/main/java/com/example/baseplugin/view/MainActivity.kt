@@ -7,6 +7,7 @@ import com.example.baseplugin.viewmodel.MainViewModel
 import com.harrison.plugin.mvvm.base.impl.ABaseActivityView
 import com.harrison.plugin.util.developer.LogUtils
 import com.harrison.plugin.util.developer.Performance
+import com.harrison.plugin.util.hardware.Memory
 
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -14,12 +15,18 @@ class MainActivity : ABaseActivityView<MainViewModel>(){
 
 
     override fun initView() {
+
+        Performance.startCountTime("1")
         setContentView(R.layout.activity_main)
+        LogUtils.e("result", "count time:" + Performance.endCountTime("1"))
+
         button_jump_to_mvvm.setOnClickListener(onClickListener)
         button_jump_to_second.setOnClickListener(onClickListener)
         button_start_request.setOnClickListener(onClickListener)
 
-        Performance.showFPSView(this)
+
+        Thread.sleep(500)
+
     }
 
     override fun initViewObservable() {
@@ -38,9 +45,9 @@ class MainActivity : ABaseActivityView<MainViewModel>(){
 
     private var onClickListener = View.OnClickListener {
 
-
         when (it.id) {
             R.id.button_jump_to_mvvm -> {
+                Memory.showMemoryInfoOnLog(this)
             }
             R.id.button_jump_to_second ->{
                 var intent = Intent(this,SecondActivity::class.java)

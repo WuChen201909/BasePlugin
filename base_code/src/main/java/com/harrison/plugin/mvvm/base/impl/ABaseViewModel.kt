@@ -3,33 +3,40 @@ package com.harrison.plugin.mvvm.base.impl
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.harrison.plugin.mvvm.base.IViewModel
-import com.harrison.plugin.util.developer.LogUtils
-import kotlinx.coroutines.CoroutineExceptionHandler
+import com.harrison.plugin.util.io.CoroutineUtils
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
+import org.json.JSONException
+import java.io.IOException
+import java.lang.Exception
 
 
 open class ABaseViewModel(application: Application) : IViewModel,
-    AndroidViewModel(application) ,
-    CoroutineScope by MainScope() {
+    AndroidViewModel(application) {
 
 
-
-    fun launch(block: suspend CoroutineScope.() -> Unit,error: (error:String) -> Unit){
-        var exceptionHandler = CoroutineExceptionHandler {
-                _ : CoroutineContext, throwable: Throwable ->
-            error(throwable.message.toString())
-            LogUtils.printException(throwable)
-        }
-
-        launch(exceptionHandler){
-            block()
+    fun launch(async: suspend CoroutineScope.() -> String, callResult: (error:String) -> Unit, callError: (error:String) -> Unit){
+        CoroutineUtils.launchIO {
+            try {
+                var re =  async()
+                CoroutineUtils.launchMain {
+                    callResult(re)
+                }
+            }catch (e:Exception){
+                var describe = ""
+                when(e){
+                    is IOException -> {
+                        describe = "网络异常"
+                    }
+                    is JSONException ->{
+                        describe = "解析异常"
+                    }
+                }
+                CoroutineUtils.launchMain {
+                    callError("$describe\n:$e")
+                }
+            }
         }
     }
-
-
 
 }
 

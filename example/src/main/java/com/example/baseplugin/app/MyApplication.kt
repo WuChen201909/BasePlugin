@@ -9,11 +9,12 @@ class MyApplication : MVVMApplication() {
     override fun onCreate() {
         super.onCreate()
 
-        Performance.showFPSView(this)
 
         LogUtils.init(true,"result")
         LogUtils.i("打印日志")
-        Performance.init(true)
+
+        Performance.init(this, analyze = true, showFps = true, showFPSLog = false)
+        
     }
 
 }

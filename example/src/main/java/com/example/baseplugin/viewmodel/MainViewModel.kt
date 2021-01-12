@@ -17,8 +17,7 @@ class MainViewModel(application: Application) : ABaseViewModel(application) {
             Log.i("result","执行结果$result")
             result.toString()
         },{ result ->
-            httpLiveEvent.setValue(HttpResponseCode.SUCCESS, result.toString())
-
+            httpLiveEvent.setValue(HttpResponseCode.SUCCESS, result)
         },{
             httpLiveEvent.setValue(HttpResponseCode.HTTP_LOCAL_DEFAULT_ERROR, null)
             Log.i("result","执行异常 $it")

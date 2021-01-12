@@ -7,7 +7,7 @@ import android.os.Bundle
 /**
  * 用于视图的堆栈管理
  */
-open class MVVMApplication: Application() {
+open abstract class MVVMApplication: Application() {
     
 
 

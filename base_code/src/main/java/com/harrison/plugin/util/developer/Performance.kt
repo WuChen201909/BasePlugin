@@ -29,20 +29,27 @@ object Performance {
 
 
     /**
-     * @param analyze 是否打开卡顿检测
+     * @param analyze 是否打开性能分析
+     * @param showFps 是否在屏幕显示FPS
+     * @param showFPSLog 是否打印FPS Log
+     *
      */
-    fun init(analyze: Boolean) {
+    fun init(application: Application?, analyze: Boolean,showFps:Boolean,showFPSLog:Boolean) {
         if (isInit) return
         doFrame()
+        if(showFps && application != null){
+            showFPSView(application)
+        }
         if (analyze) {
             this.analyze = analyze
-            showFPSLog()
             startSnapShootThread()
             startAnalyzeMainThread()
         }
+        if(showFPSLog){
+            showFPSLog()
+        }
         isInit = true
     }
-
 
     /**
      * ================================================================================
@@ -74,7 +81,7 @@ object Performance {
     /**
      * 将FPS显示在屏幕上
      */
-    fun showFPSView(application: Application) {
+    private fun showFPSView(application: Application) {
         application.registerActivityLifecycleCallbacks(
             object : Application.ActivityLifecycleCallbacks {
                 var activityStack = hashSetOf<Activity>()
@@ -270,12 +277,13 @@ object Performance {
 
                 val resultBuffer = StringBuffer()
                 resultBuffer.append("=========================================\n")
+                resultBuffer.append("应用出现了卡顿以下是造成本次卡顿的堆栈信息：\n")
                 // 打印结果
                 for (i in resultTask!!.indices) {
                     resultBuffer.append("${resultTask!![i]} \n")
                 }
                 resultBuffer.append("=========================================\n")
-                LogUtils.e("BlockDetectUtil", "\n应用出现了卡顿以下是造成本次卡顿的堆栈信息：\n$resultBuffer")
+                LogUtils.e(resultBuffer)
             }
         }.start()
     }
@@ -284,7 +292,6 @@ object Performance {
      * 添加分析任务到任务队列
      */
     private fun addSnapShoot(list: MutableList<Array<StackTraceElement>>) {
-//        LogUtils.e("BlockDetectUtil", "分析超时快照")
         while (true) {
             synchronized(stackList) {
                 if (stackList.size < maxSize) {
@@ -325,6 +332,7 @@ object Performance {
         for (i in lineNumber until snapShoot[0].size) {  //遍历行
             val lastLine = snapShoot[0][i]
             var j = 0
+            var count = 0
             while (j < snapShoot.size) {
                 //遍历堆栈
                 //将当前行不同的数据递归下去处理
@@ -341,10 +349,11 @@ object Performance {
                     snapShoot.removeAt(j)
                     lineNumberMap[lastLine] = i
                     j--
+                    count++
                 }
                 j++
             }
-            result.add(space.toString() + lastLine)
+            result.add("$space$lastLine[$count]")
         }
 
         // 获取所有与当前任务不同的节点

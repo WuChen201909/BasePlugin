@@ -2,6 +2,7 @@ package com.harrison.plugin.util.developer
 
 import android.app.Activity
 import android.app.Application
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Looper
 import android.view.Choreographer
@@ -81,41 +82,56 @@ object Performance {
     /**
      * 将FPS显示在屏幕上
      */
-    private fun showFPSView(application: Application) {
+    fun showFPSView(application: Application) {
         application.registerActivityLifecycleCallbacks(
             object : Application.ActivityLifecycleCallbacks {
                 var activityStack = hashSetOf<Activity>()
+                var callBackStack = hashMapOf<Activity,(Int)->Unit>()
 
-                override fun onActivityCreated(activity: Activity, bundle: Bundle?) {}
-                override fun onActivityStarted(activity: Activity) {
-                    if(!activityStack.contains(activity)){
-                        addFPSView(activity)
+                init {
+                    addFPSCallBack {
+                        for ((key,value) in callBackStack){
+                            value(it)
+                        }
                     }
+                }
+                override fun onActivityCreated(activity: Activity, bundle: Bundle?) {
+                    if(!activityStack.contains(activity)){
+                        var textView = addFPSView(activity)
+                        callBackStack[activity] = {
+                            textView.text = "fps: [$it]"
+                        }
+                    }
+                }
+                override fun onActivityStarted(activity: Activity) {
+
                 }
                 override fun onActivityResumed(p0: Activity) {}
                 override fun onActivityPaused(p0: Activity) {}
                 override fun onActivityStopped(activity: Activity) {
                     activityStack.remove(activity)
+                    callBackStack.remove(activity)
                 }
                 override fun onActivitySaveInstanceState(p0: Activity, p1: Bundle) {}
                 override fun onActivityDestroyed(p0: Activity) {}
+
             }
         )
     }
 
-    private fun addFPSView(activity: Activity){
+    private fun addFPSView(activity: Activity) : TextView{
         var decorView = activity.window.decorView.findViewById<FrameLayout>(android.R.id.content)
         var showView = TextView(activity)
         showView.text = ""
+        showView.setTextColor(Color.RED)
         var layoutParameter = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT)
         showView.layoutParams = layoutParameter
         layoutParameter.gravity = Gravity.TOP
         decorView.addView(showView)
-        addFPSCallBack { showView.text = "fps: [$it]" }
+        return showView
     }
-
     /**
      * 开始响应屏幕刷新事件
      */

@@ -31,7 +31,7 @@ object Performance {
 
     /**
      * @param analyze 是否打开性能分析
-     * @param showFps 是否在屏幕显示FPS
+     * @param showFps 是否在屏幕显示 FPS
      * @param showFPSLog 是否打印FPS Log
      *
      */
@@ -85,9 +85,7 @@ object Performance {
     fun showFPSView(application: Application) {
         application.registerActivityLifecycleCallbacks(
             object : Application.ActivityLifecycleCallbacks {
-                var activityStack = hashSetOf<Activity>()
                 var callBackStack = hashMapOf<Activity,(Int)->Unit>()
-
                 init {
                     addFPSCallBack {
                         for ((key,value) in callBackStack){
@@ -95,25 +93,22 @@ object Performance {
                         }
                     }
                 }
-                override fun onActivityCreated(activity: Activity, bundle: Bundle?) {
-                    if(!activityStack.contains(activity)){
+                override fun onActivityCreated(activity: Activity, bundle: Bundle?) {}
+                override fun onActivityStarted(activity: Activity) {
+                    if(!callBackStack.containsKey(activity) ){
                         var textView = addFPSView(activity)
                         callBackStack[activity] = {
                             textView.text = "fps: [$it]"
                         }
                     }
                 }
-                override fun onActivityStarted(activity: Activity) {
-
-                }
                 override fun onActivityResumed(p0: Activity) {}
                 override fun onActivityPaused(p0: Activity) {}
-                override fun onActivityStopped(activity: Activity) {
-                    activityStack.remove(activity)
+                override fun onActivityStopped(activity: Activity) {}
+                override fun onActivitySaveInstanceState(p0: Activity, p1: Bundle) {}
+                override fun onActivityDestroyed(activity: Activity) {
                     callBackStack.remove(activity)
                 }
-                override fun onActivitySaveInstanceState(p0: Activity, p1: Bundle) {}
-                override fun onActivityDestroyed(p0: Activity) {}
 
             }
         )
@@ -227,7 +222,7 @@ object Performance {
      * 启动快照线程
      */
     private fun startSnapShootThread() {
-        Thread {
+        var snapShootThread = Thread {
             while (true) {
                 // 开始快照
                 val stackTrace = Looper.getMainLooper().thread.stackTrace
@@ -252,15 +247,16 @@ object Performance {
                     e.printStackTrace()
                 }
             }
-        }.start()
+        }
+        snapShootThread.name = "snapShoot"
+        snapShootThread.start()
     }
-
 
     /**
      * 检测线程
      */
     private fun startAnalyzeMainThread() {
-        Thread {
+        var analyzeThread =  Thread {
             while (true) {
                 var list: List<Array<StackTraceElement>>? = null
                 synchronized(stackList) {
@@ -290,6 +286,7 @@ object Performance {
                 }
 
                 resultTask = analyzeStackTrace(0, 0, covertStackTrace)
+                if(resultTask == null )continue
 
                 val resultBuffer = StringBuffer()
                 resultBuffer.append("=========================================\n")
@@ -301,7 +298,10 @@ object Performance {
                 resultBuffer.append("=========================================\n")
                 LogUtils.e(resultBuffer)
             }
-        }.start()
+        }
+
+        analyzeThread.name = "analyze"
+        analyzeThread.start()
     }
 
     /**
@@ -335,6 +335,7 @@ object Performance {
         lineNumber: Int, level: Int,
         snapShoot: MutableList<List<String>>,
     ): MutableList<String>? {
+        if(snapShoot.size == 0)return null
         // 生成缩进占位符
         val space = StringBuffer()
         for (i in 0 until level) {

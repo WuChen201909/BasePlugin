@@ -27,4 +27,9 @@
         android:layout_height="wrap_content"
         android:text="开始请求"></Button>
 
+    <ImageView
+        android:id="@+id/ivCoverImg"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        ></ImageView>
 </LinearLayout>

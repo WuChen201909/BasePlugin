@@ -1,15 +1,17 @@
-package com.harrison.plugin.util.developer
+package com.kok.kuailong.utils
 
 import android.app.Activity
 import android.app.Application
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Looper
+import android.util.Log
 import android.view.Choreographer
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
+import com.harrison.plugin.util.developer.LogUtils
 import java.util.*
 
 /**
@@ -35,10 +37,10 @@ object Performance {
      * @param showFPSLog 是否打印FPS Log
      *
      */
-    fun init(application: Application?, analyze: Boolean,showFps:Boolean,showFPSLog:Boolean) {
+    fun init(application: Application?, analyze: Boolean, showFps: Boolean, showFPSLog: Boolean) {
         if (isInit) return
         doFrame()
-        if(showFps && application != null){
+        if (showFps && application != null) {
             showFPSView(application)
         }
         if (analyze) {
@@ -46,7 +48,7 @@ object Performance {
             startSnapShootThread()
             startAnalyzeMainThread()
         }
-        if(showFPSLog){
+        if (showFPSLog) {
             showFPSLog()
         }
         isInit = true
@@ -75,7 +77,7 @@ object Performance {
      */
     private fun showFPSLog() {
         addFPSCallBack {
-            LogUtils.i("fps: [$it]")
+            LogUtils.e("fps: [$it]")
         }
     }
 
@@ -85,17 +87,17 @@ object Performance {
     fun showFPSView(application: Application) {
         application.registerActivityLifecycleCallbacks(
             object : Application.ActivityLifecycleCallbacks {
-                var callBackStack = hashMapOf<Activity,(Int)->Unit>()
+                var callBackStack = hashMapOf<Activity, (Int) -> Unit>()
                 init {
                     addFPSCallBack {
-                        for ((key,value) in callBackStack){
+                        for ((key, value) in callBackStack) {
                             value(it)
                         }
                     }
                 }
                 override fun onActivityCreated(activity: Activity, bundle: Bundle?) {}
                 override fun onActivityStarted(activity: Activity) {
-                    if(!callBackStack.containsKey(activity) ){
+                    if (!callBackStack.containsKey(activity)) {
                         var textView = addFPSView(activity)
                         callBackStack[activity] = {
                             textView.text = "fps: [$it]"
@@ -109,24 +111,25 @@ object Performance {
                 override fun onActivityDestroyed(activity: Activity) {
                     callBackStack.remove(activity)
                 }
-
             }
         )
     }
 
-    private fun addFPSView(activity: Activity) : TextView{
+    private fun addFPSView(activity: Activity): TextView {
         var decorView = activity.window.decorView.findViewById<FrameLayout>(android.R.id.content)
         var showView = TextView(activity)
         showView.text = ""
         showView.setTextColor(Color.RED)
         var layoutParameter = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT)
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
         showView.layoutParams = layoutParameter
         layoutParameter.gravity = Gravity.TOP
         decorView.addView(showView)
         return showView
     }
+
     /**
      * 开始响应屏幕刷新事件
      */
@@ -192,7 +195,7 @@ object Performance {
      * ================================================================================
      */
 
-    private const val TIME_BLOCK: Int = 100 //阈值，执行超过指定时间，阀值要大于16否则无效
+    private const val TIME_BLOCK: Int = 100 //阈值，doFrame超过当前阀值没有被调用则做为卡顿分析
 
     private const val FREQUENCY = 10 //采样频率，表示超时部分采样多少次
 
@@ -256,7 +259,7 @@ object Performance {
      * 检测线程
      */
     private fun startAnalyzeMainThread() {
-        var analyzeThread =  Thread {
+        var analyzeThread = Thread {
             while (true) {
                 var list: List<Array<StackTraceElement>>? = null
                 synchronized(stackList) {
@@ -286,8 +289,7 @@ object Performance {
                 }
 
                 resultTask = analyzeStackTrace(0, 0, covertStackTrace)
-                if(resultTask == null )continue
-
+                if (resultTask == null) continue
                 val resultBuffer = StringBuffer()
                 resultBuffer.append("=========================================\n")
                 resultBuffer.append("应用出现了卡顿以下是造成本次卡顿的堆栈信息：\n")
@@ -296,10 +298,9 @@ object Performance {
                     resultBuffer.append("${resultTask!![i]} \n")
                 }
                 resultBuffer.append("=========================================\n")
-                LogUtils.e(resultBuffer)
+                LogUtils.e(resultBuffer.toString())
             }
         }
-
         analyzeThread.name = "analyze"
         analyzeThread.start()
     }
@@ -335,7 +336,7 @@ object Performance {
         lineNumber: Int, level: Int,
         snapShoot: MutableList<List<String>>,
     ): MutableList<String>? {
-        if(snapShoot.size == 0)return null
+        if (snapShoot.size == 0) return null
         // 生成缩进占位符
         val space = StringBuffer()
         for (i in 0 until level) {
@@ -347,12 +348,10 @@ object Performance {
         val newSnapShoot: MutableMap<String, MutableList<List<String>>> = HashMap()
         val lineNumberMap: MutableMap<String, Int> = HashMap()
         for (i in lineNumber until snapShoot[0].size) {  //遍历行
-            val lastLine = snapShoot[0][i]
-            var j = 0
-            var count = 0
+            val lastLine = snapShoot[0][i]  // 第0个作为对照
+            var j = 1                       // 从第一个开始与第0个对照
+            var count = 1
             while (j < snapShoot.size) {
-                //遍历堆栈
-                //将当前行不同的数据递归下去处理
                 if (snapShoot[j].size <= i) {
                     j++
                     continue
@@ -365,10 +364,10 @@ object Performance {
                     temp.add(snapShoot[j])
                     snapShoot.removeAt(j)
                     lineNumberMap[lastLine] = i
-                    j--
+                } else {
                     count++
+                    j++
                 }
-                j++
             }
             result.add("$space$lastLine[$count]")
         }

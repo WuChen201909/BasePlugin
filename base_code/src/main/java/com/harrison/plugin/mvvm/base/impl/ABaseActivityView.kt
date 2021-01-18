@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.harrison.plugin.mvvm.base.IView
 import com.harrison.plugin.mvvm.core.MVVMApplication
 import com.harrison.plugin.util.developer.LogUtils
-import com.harrison.plugin.util.developer.Performance
 
 
 open abstract class ABaseActivityView<T : ABaseViewModel> : IView, AppCompatActivity() {

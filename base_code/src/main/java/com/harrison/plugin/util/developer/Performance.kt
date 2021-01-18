@@ -2,16 +2,20 @@ package com.kok.kuailong.utils
 
 import android.app.Activity
 import android.app.Application
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.view.Choreographer
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.harrison.plugin.util.developer.LogUtils
+import java.text.DecimalFormat
 import java.util.*
 
 /**
@@ -88,6 +92,7 @@ object Performance {
         application.registerActivityLifecycleCallbacks(
             object : Application.ActivityLifecycleCallbacks {
                 var callBackStack = hashMapOf<Activity, (Int) -> Unit>()
+
                 init {
                     addFPSCallBack {
                         for ((key, value) in callBackStack) {
@@ -95,15 +100,14 @@ object Performance {
                         }
                     }
                 }
+
                 override fun onActivityCreated(activity: Activity, bundle: Bundle?) {}
                 override fun onActivityStarted(activity: Activity) {
                     if (!callBackStack.containsKey(activity)) {
-                        var textView = addFPSView(activity)
-                        callBackStack[activity] = {
-                            textView.text = "fps: [$it]"
-                        }
+                        callBackStack[activity] = addFPSView(activity)
                     }
                 }
+
                 override fun onActivityResumed(p0: Activity) {}
                 override fun onActivityPaused(p0: Activity) {}
                 override fun onActivityStopped(activity: Activity) {}
@@ -115,20 +119,6 @@ object Performance {
         )
     }
 
-    private fun addFPSView(activity: Activity): TextView {
-        var decorView = activity.window.decorView.findViewById<FrameLayout>(android.R.id.content)
-        var showView = TextView(activity)
-        showView.text = ""
-        showView.setTextColor(Color.RED)
-        var layoutParameter = FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        showView.layoutParams = layoutParameter
-        layoutParameter.gravity = Gravity.TOP
-        decorView.addView(showView)
-        return showView
-    }
 
     /**
      * 开始响应屏幕刷新事件
@@ -379,5 +369,107 @@ object Performance {
         return result
     }
 
+
+    /**
+     * ============================================================================
+     * 性能显示的视图结构
+     * ============================================================================
+     */
+
+    private fun addFPSView(activity: Activity): (Int) -> Unit {
+        var decorView = activity.window.decorView.findViewById<FrameLayout>(android.R.id.content)
+
+        var showRootLayout = TouchMoveLayout(activity)
+        var layoutParamet = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        showRootLayout.layoutParams = layoutParamet;
+
+        var showLayout = LinearLayout(activity)
+        layoutParamet = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        showLayout.layoutParams = layoutParamet
+
+        showLayout.setBackgroundColor(Color.parseColor("#99808A87"))
+
+        var showView = TextView(activity)
+        showView.setTextColor(Color.RED)
+        var layoutParameter = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        showView.layoutParams = layoutParameter
+
+        showLayout.addView(showView)
+        showRootLayout.addView(showLayout)
+        decorView.addView(showRootLayout)
+        return {
+            val totalMemory = (Runtime.getRuntime().totalMemory() * 1.0 / (1024 * 1024)).toFloat()
+            showView.text = "FPS:$it M:${DecimalFormat("#.00").format(Math.abs(totalMemory))}"
+        }
+    }
+
+    class TouchMoveLayout(context: Context) : FrameLayout(context) {
+
+        var startX: Float = 0f
+        var startY: Float = 0f
+        var startLeft: Float = 0f
+        var startTop: Float = 0f
+
+        override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+            super.onLayout(changed, left, top, right, bottom)
+        }
+
+        override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+            return onTouchEvent(ev)
+        }
+
+        override fun onTouchEvent(event: MotionEvent?): Boolean {
+            var moveView = getChildAt(0)
+            when (event!!.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    startX = event.x
+                    startY = event.y
+
+                    startLeft = moveView.left.toFloat()
+                    startTop = moveView.top.toFloat()
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    var layoutParames = moveView.layoutParams as FrameLayout.LayoutParams
+                    layoutParames.leftMargin = ((event.x-startX)+startLeft).toInt()
+                    layoutParames.topMargin = ((event.y-startY)+startTop).toInt()
+                    requestLayout()
+                }
+                MotionEvent.ACTION_UP -> {
+                    // 贴边操作
+                    var layoutParames = moveView.layoutParams as FrameLayout.LayoutParams
+                    if((event.x-startX)+startLeft > resources.displayMetrics.widthPixels/2){
+                        layoutParames.leftMargin = resources.displayMetrics.widthPixels - moveView.measuredWidth
+                    }else{
+                        layoutParames.leftMargin = 0
+                    }
+                    layoutParames.topMargin = ((event.y-startY)+startTop).toInt()
+                    requestLayout()
+
+                    startX = 0f
+                    startY = 0f
+                }
+            }
+
+            if (event?.x!! > moveView.left
+                && event?.y!! > moveView.top
+                && event?.x!! <= moveView.left + moveView.measuredWidth
+                && event?.y!! <= moveView.top + moveView.measuredHeight
+            ) {
+                return true
+            } else {
+                return false
+            }
+        }
+
+    }
 
 }

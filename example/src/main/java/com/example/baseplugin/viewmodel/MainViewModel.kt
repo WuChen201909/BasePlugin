@@ -12,15 +12,15 @@ class MainViewModel(application: Application) : ABaseViewModel(application) {
     var httpLiveEvent = HttpLiveEvent<String>()
 
     fun exeTest(){
-        launch({
+        launch<String>({
             var result =  RetrofitManager.instance().getInformationType()
             Log.i("result","执行结果$result")
             result.toString()
         },{ result ->
             httpLiveEvent.setValue(HttpResponseCode.SUCCESS, result)
-        },{
+        },{ code: Int, error: String ->
             httpLiveEvent.setValue(HttpResponseCode.HTTP_LOCAL_DEFAULT_ERROR, null)
-            Log.i("result","执行异常 $it")
+            Log.i("result","执行异常  $code $error")
         })
     }
 

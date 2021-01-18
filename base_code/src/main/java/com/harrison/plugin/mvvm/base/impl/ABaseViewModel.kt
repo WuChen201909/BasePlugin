@@ -14,14 +14,14 @@ open class ABaseViewModel(application: Application) : IViewModel,
     AndroidViewModel(application) {
 
 
-    fun launch(async: suspend CoroutineScope.() -> String, callResult: (error:String) -> Unit, callError: (error:String) -> Unit){
+    fun <T> launch(async: suspend CoroutineScope.() -> T, callResult: (error:T) -> Unit, callError: (code:Int,error:String) -> Unit){
         CoroutineUtils.launchIO {
             try {
                 var re =  async()
                 CoroutineUtils.launchMain {
                     callResult(re)
                 }
-            }catch (e:Exception){
+            } catch (e:Exception){
                 var describe = ""
                 when(e){
                     is IOException -> {
@@ -32,11 +32,13 @@ open class ABaseViewModel(application: Application) : IViewModel,
                     }
                 }
                 CoroutineUtils.launchMain {
-                    callError("$describe\n:$e")
+                    callError(-200,"$describe\n:$e")
                 }
             }
         }
     }
+
+
 
 }
 

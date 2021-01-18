@@ -7,6 +7,11 @@ import android.content.Context
  */
 object MonitorUtils {
 
+
+    fun init(){
+
+    }
+
     /**
      * 显示屏幕信息在Log中
      */

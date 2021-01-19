@@ -34,7 +34,6 @@ object Performance {
     private var countTimeMap: MutableMap<String, Long> = mutableMapOf()
     private var countTimeType: MutableMap<String, Boolean> = mutableMapOf()
 
-
     /**
      * @param analyze 是否打开性能分析
      * @param showFps 是否在屏幕显示 FPS

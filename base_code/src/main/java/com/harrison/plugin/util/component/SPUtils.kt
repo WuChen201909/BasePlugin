@@ -14,7 +14,7 @@ class SPUtils private constructor(spName: String) {
     private val sp: SharedPreferences
 
     init {
-        sp = MVVMApplication.application.getSharedPreferences(spName, Context.MODE_PRIVATE)
+        sp = MVVMApplication.mvvmApplication.getSharedPreferences(spName, Context.MODE_PRIVATE)
     }
     /**
      * SP中写入String

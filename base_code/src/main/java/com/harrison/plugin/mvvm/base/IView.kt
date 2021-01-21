@@ -12,7 +12,7 @@ interface IView {
     fun initView()
 
     /**
-     * 绑定ViewModel进行操作，一般是界面在前台的状态
+     * 绑定ViewModel进行操作，一般是界面在前台的状态  // 去掉
      */
     fun bindViewModel()
 

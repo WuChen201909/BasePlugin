@@ -37,7 +37,7 @@ open abstract class BaseFragmentView<T : BaseViewModel> : IView, Fragment() {
 
         viewModel = ViewModelProvider(
             this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(MVVMApplication.application)
+            ViewModelProvider.AndroidViewModelFactory.getInstance(MVVMApplication.mvvmApplication)
         ).get(getViewModelClass())
 
         initViewObservable()

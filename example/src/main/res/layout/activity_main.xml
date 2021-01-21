@@ -27,6 +27,12 @@
         android:layout_height="wrap_content"
         android:text="开始请求"></Button>
 
+    <Button
+        android:id="@+id/button_main_add_window"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="在添加Window"></Button>
+
     <ImageView
         android:id="@+id/ivCoverImg"
         android:layout_width="match_parent"

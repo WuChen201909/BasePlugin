@@ -3,20 +3,26 @@ package com.kok.kuailong.utils
 import android.app.Activity
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
+import android.graphics.PixelFormat
+import android.graphics.drawable.ColorDrawable
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
-import android.util.Log
-import android.view.Choreographer
-import android.view.Gravity
-import android.view.MotionEvent
-import android.view.ViewGroup
+import android.provider.Settings
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
+import android.view.*
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.TextView
 import com.harrison.plugin.util.developer.LogUtils
 import java.text.DecimalFormat
 import java.util.*
+
 
 /**
  * 性能分析工具
@@ -25,14 +31,10 @@ object Performance {
 
     private var isInit = false
 
-    private var countStartSecond: Long = 1
-    private var fps = 1
-    private var fpsCallBack: MutableList<(Int) -> Unit> = mutableListOf()
+    private const val TIME_BLOCK: Int = 100 //阈值，doFrame超过当前阀值没有被调用则做为卡顿分析
 
-    private var analyze = false
+    private const val FREQUENCY = 10 //采样频率，表示超时部分采样多少次
 
-    private var countTimeMap: MutableMap<String, Long> = mutableMapOf()
-    private var countTimeType: MutableMap<String, Boolean> = mutableMapOf()
 
     /**
      * @param analyze 是否打开性能分析
@@ -47,7 +49,6 @@ object Performance {
             showFPSView(application)
         }
         if (analyze) {
-            this.analyze = analyze
             startSnapShootThread()
             startAnalyzeMainThread()
         }
@@ -63,6 +64,9 @@ object Performance {
      * ================================================================================
      */
 
+    private var countStartSecond: Long = 1
+    private var fps = 1
+    private var fpsCallBack: MutableList<(Int) -> Unit> = mutableListOf()
 
     /**
      * 添加和删除fps回掉函数
@@ -88,39 +92,45 @@ object Performance {
      * 将FPS显示在屏幕上
      */
     fun showFPSView(application: Application) {
+
         application.registerActivityLifecycleCallbacks(
             object : Application.ActivityLifecycleCallbacks {
-                var callBackStack = hashMapOf<Activity, (Int) -> Unit>()
-
-                init {
-                    addFPSCallBack {
-                        for ((key, value) in callBackStack) {
-                            value(it)
-                        }
-                    }
-                }
+                var firstRequest = true
+                var startActivityCount = 0
 
                 override fun onActivityCreated(activity: Activity, bundle: Bundle?) {}
-                override fun onActivityStarted(activity: Activity) {
-                    if (!callBackStack.containsKey(activity)) {
-                        callBackStack[activity] = addFPSView(activity)
+                override fun onActivityStarted(activity: Activity) {}
+                override fun onActivityResumed(activity: Activity) {
+                    if (Settings.canDrawOverlays(activity) && startActivityCount == 0) {
+                        showFPSWindow(application)
+                    } else if (firstRequest) {
+                        activity.startActivityForResult(
+                            Intent(
+                                Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse(
+                                    "package:" + activity.getPackageName()
+                                )
+                            ), 0
+                        );
                     }
+                    firstRequest = false
+                    startActivityCount++
                 }
 
-                override fun onActivityResumed(p0: Activity) {}
                 override fun onActivityPaused(p0: Activity) {}
-                override fun onActivityStopped(activity: Activity) {}
-                override fun onActivitySaveInstanceState(p0: Activity, p1: Bundle) {}
-                override fun onActivityDestroyed(activity: Activity) {
-                    callBackStack.remove(activity)
+                override fun onActivityStopped(activity: Activity) {
+                    startActivityCount--
+                    if (startActivityCount == 0) hideFPSWindow()
                 }
+
+                override fun onActivitySaveInstanceState(p0: Activity, p1: Bundle) {}
+                override fun onActivityDestroyed(activity: Activity) {}
             }
         )
     }
 
 
     /**
-     * 开始响应屏幕刷新事件
+     * 每隔16毫秒刷新一次。
      */
     private fun doFrame() {
         Choreographer.getInstance().postFrameCallback {
@@ -138,9 +148,8 @@ object Performance {
                 countStartSecond = t
             }
 
-            if (analyze) {
-                resetSelf()
-            }
+            // 每次刷新重置快照堆栈以及快照计时
+            resetSelf()
 
             doFrame()
         }
@@ -152,6 +161,9 @@ object Performance {
      * 计时工具
      * ================================================================================
      */
+
+    private var countTimeMap: MutableMap<String, Long> = mutableMapOf()
+    private var countTimeType: MutableMap<String, Boolean> = mutableMapOf()
 
     /**
      *
@@ -184,9 +196,7 @@ object Performance {
      * ================================================================================
      */
 
-    private const val TIME_BLOCK: Int = 100 //阈值，doFrame超过当前阀值没有被调用则做为卡顿分析
 
-    private const val FREQUENCY = 10 //采样频率，表示超时部分采样多少次
 
     var time: Int = FREQUENCY
 
@@ -201,7 +211,7 @@ object Performance {
 
 
     /**
-     * 重置快照计数
+     *
      */
     private fun resetSelf() {
         synchronized(list) {
@@ -214,6 +224,7 @@ object Performance {
      * 启动快照线程
      */
     private fun startSnapShootThread() {
+
         var snapShootThread = Thread {
             while (true) {
                 // 开始快照
@@ -224,7 +235,7 @@ object Performance {
 
                 //检测阀值
                 time--
-                if (time == 0) { // 表示超过阀值
+                if (time == 0) { //如果阀值时间为0表示本次快照超过了阀值时间，并且界面还没有调用doFrame刷新界面
                     time = FREQUENCY
                     synchronized(list) {
                         addSnapShoot(list)
@@ -240,6 +251,7 @@ object Performance {
                 }
             }
         }
+
         snapShootThread.name = "snapShoot"
         snapShootThread.start()
     }
@@ -375,100 +387,166 @@ object Performance {
      * ============================================================================
      */
 
-    private fun addFPSView(activity: Activity): (Int) -> Unit {
-        var decorView = activity.window.decorView.findViewById<FrameLayout>(android.R.id.content)
+    var windowManager: WindowManager? = null
+    var layoutParams: WindowManager.LayoutParams? = null
+    var flotLayout: FrameLayout? = null
+    var showFPSView: TextView? = null
 
-        var showRootLayout = TouchMoveLayout(activity)
-        var layoutParamet = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
-        showRootLayout.layoutParams = layoutParamet;
+    const val  FPS_DEFAULT_TOP = 30
+    const val  FPS_LAYOUT_WIDTH = 65
+    const val  FPS_LAYOUT_HEIGHT = 40
 
-        var showLayout = LinearLayout(activity)
-        layoutParamet = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        showLayout.layoutParams = layoutParamet
+    private fun showFPSWindow(application: Application) {
+        if (windowManager == null) {
+            windowManager = application.getSystemService(Context.WINDOW_SERVICE) as WindowManager?
 
-        showLayout.setBackgroundColor(Color.parseColor("#99808A87"))
+            layoutParams = WindowManager.LayoutParams().apply {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    this.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+                } else {
+                    this.type = WindowManager.LayoutParams.TYPE_PHONE
+                }
+                var density = application.resources.displayMetrics.density
+                this.format = PixelFormat.RGBA_8888
+                this.gravity = Gravity.LEFT or Gravity.TOP
+                this.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                this.width = (FPS_LAYOUT_WIDTH*density).toInt()
+                this.height = (FPS_LAYOUT_HEIGHT*density).toInt()
+                this.x = 0
+                this.y = (FPS_DEFAULT_TOP*density).toInt()
+            }
 
-        var showView = TextView(activity)
-        showView.setTextColor(Color.RED)
-        var layoutParameter = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        showView.layoutParams = layoutParameter
+            showFPSView = TextView(application).apply {
+                var frameParameter = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
+                )
+                frameParameter.gravity = Gravity.CENTER
+                this.layoutParams = frameParameter
+//                setLineSpacing(0f,0.8f)
+            }
 
-        showLayout.addView(showView)
-        showRootLayout.addView(showLayout)
-        decorView.addView(showRootLayout)
-        return {
-            val totalMemory = (Runtime.getRuntime().totalMemory() * 1.0 / (1024 * 1024)).toFloat()
-            showView.text = "FPS:$it \nM:${DecimalFormat("#.00").format(Math.abs(totalMemory))}"
+            flotLayout = FrameLayout(application).apply {
+                var frameParameter = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
+                )
+                this.layoutParams = frameParameter
+                background = ColorDrawable(Color.parseColor("#3B3B3B"))
+                addView(showFPSView)
+                setOnTouchListener(FloatingOnTouchListener())
+            }
         }
+        windowManager?.addView(flotLayout, layoutParams)
+
+        addFPSCallBack(Performance::fpsWindowCallBack)
     }
 
-    class TouchMoveLayout(context: Context) : FrameLayout(context) {
+    fun fpsWindowCallBack(fps: Int) {
+        if (flotLayout == null) return
 
-        var startX: Float = 0f
-        var startY: Float = 0f
-        var startLeft: Float = 0f
-        var startTop: Float = 0f
+        var showBuilder = SpannableStringBuilder()
 
-        override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-            super.onLayout(changed, left, top, right, bottom)
-        }
+        var fpsColorStauts =
+            when {
+                fps > 40 -> {
+                    "#B5DF3A"
+                }
+                fps <= 40 && fps > 25 -> {
+                    "#E97F02"
+                }
+                else -> {
+                    "#EF5285"
+                }
+            }
+        val fpsValueSpan = SpannableString("$fps")
+        val fpsValueSpanColor = ForegroundColorSpan(Color.parseColor(fpsColorStauts))
+        fpsValueSpan.setSpan(
+            fpsValueSpanColor,
+            0,
+            "$fps".length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        );
+        showBuilder.append(fpsValueSpan)
+        showBuilder.append("   ")
 
-        override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-            return onTouchEvent(ev)
-        }
+        val fpsKeySpan = SpannableString("FPS")
+        val fpsKeySpanColor = ForegroundColorSpan(Color.WHITE)
+        fpsKeySpan.setSpan(fpsKeySpanColor, 0, "FPS".length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        showBuilder.append(fpsKeySpan)
 
-        override fun onTouchEvent(event: MotionEvent?): Boolean {
-            var moveView = getChildAt(0)
-            when (event!!.action) {
+        showBuilder.append("\n")
+
+        val totalMemory = DecimalFormat("#.00").format(
+            (Runtime.getRuntime().totalMemory() * 1.0 / (1024 * 1024)).toFloat()
+        ).toString()
+        val manerayValueSpan = SpannableString(totalMemory)
+        val manerayValueSpanColor = ForegroundColorSpan(Color.parseColor("#B5DF3A"))
+        manerayValueSpan.setSpan(
+            manerayValueSpanColor,
+            0,
+            totalMemory.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        );
+        showBuilder.append(manerayValueSpan)
+        showBuilder.append(" ")
+
+        val manerayKeySpan = SpannableString("M")
+        val manerayKeySpanColor = ForegroundColorSpan(Color.WHITE)
+        manerayKeySpan.setSpan(
+            manerayKeySpanColor,
+            0,
+            "M".length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        );
+        showBuilder.append(manerayKeySpan)
+
+        showFPSView?.text = showBuilder
+
+    }
+
+    private fun hideFPSWindow() {
+        windowManager?.removeView(flotLayout)
+        removeFPSCallBack(Performance::fpsWindowCallBack)
+    }
+
+    private class FloatingOnTouchListener : View.OnTouchListener {
+        private var x = 0
+        private var y = 0
+        override fun onTouch(view: View?, event: MotionEvent): Boolean {
+            when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    startX = event.x
-                    startY = event.y
-
-                    startLeft = moveView.left.toFloat()
-                    startTop = moveView.top.toFloat()
+                    x = event.rawX.toInt()
+                    y = event.rawY.toInt()
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    var layoutParames = moveView.layoutParams as FrameLayout.LayoutParams
-                    layoutParames.leftMargin = ((event.x-startX)+startLeft).toInt()
-                    layoutParames.topMargin = ((event.y-startY)+startTop).toInt()
-                    requestLayout()
+                    val nowX = event.rawX.toInt()
+                    val nowY = event.rawY.toInt()
+                    val movedX = nowX - x
+                    val movedY = nowY - y
+                    x = nowX
+                    y = nowY
+                    if(layoutParams == null)return false
+                    layoutParams!!.x = layoutParams!!.x  + movedX
+                    layoutParams!!.y = layoutParams!!.y  + movedY
+                    windowManager?.updateViewLayout(view, layoutParams)
                 }
                 MotionEvent.ACTION_UP -> {
-                    // 贴边操作
-                    var layoutParames = moveView.layoutParams as FrameLayout.LayoutParams
-                    if((event.x-startX)+startLeft > resources.displayMetrics.widthPixels/2){
-                        layoutParames.leftMargin = resources.displayMetrics.widthPixels - moveView.measuredWidth
-                    }else{
-                        layoutParames.leftMargin = 0
+                    view?.context?.resources?.displayMetrics?.widthPixels?.let {mWidth ->
+                        if(event.rawX.toInt() > mWidth/2){
+                            layoutParams!!.x = (mWidth-FPS_LAYOUT_WIDTH*view.context.resources.displayMetrics.density).toInt()
+                        }else{
+                            layoutParams!!.x = 0
+                        }
                     }
-                    layoutParames.topMargin = ((event.y-startY)+startTop).toInt()
-                    requestLayout()
+                    windowManager!!.updateViewLayout(view, layoutParams)
+                }
+                else -> {
 
-                    startX = 0f
-                    startY = 0f
                 }
             }
-
-            if (event?.x!! > moveView.left
-                && event?.y!! > moveView.top
-                && event?.x!! <= moveView.left + moveView.measuredWidth
-                && event?.y!! <= moveView.top + moveView.measuredHeight
-            ) {
-                return true
-            } else {
-                return false
-            }
+            return false
         }
-
     }
 
 }

@@ -13,7 +13,7 @@ class MyApplication : MVVMApplication() {
         LogUtils.init(true,"test_demo")
         LogUtils.i("打印日志")
 
-      Performance.init(this, analyze = true, showFps = true, showFPSLog = false)
+        Performance.init(this, showFps = true, analyze = false, showFPSLog = false)
         
     }
 

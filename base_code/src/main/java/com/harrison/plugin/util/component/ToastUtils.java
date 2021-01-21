@@ -32,7 +32,7 @@ public final class ToastUtils {
     private static Toast sToast;
     private static int gravity         = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
     private static int xOffset         = 0;
-    private static int yOffset         = (int) (64 * MVVMApplication.application.getResources().getDisplayMetrics().density + 0.5);
+    private static int yOffset         = (int) (64 * MVVMApplication.mvvmApplication.getResources().getDisplayMetrics().density + 0.5);
     private static int backgroundColor = DEFAULT_COLOR;
     private static int bgResource      = -1;
     private static int messageColor    = DEFAULT_COLOR;
@@ -62,7 +62,7 @@ public final class ToastUtils {
      * @param layoutId 视图
      */
     public static void setView(@LayoutRes int layoutId) {
-        LayoutInflater inflate = (LayoutInflater) MVVMApplication.application.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflate = (LayoutInflater) MVVMApplication.mvvmApplication.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         sViewWeakReference = new WeakReference<>(inflate.inflate(layoutId, null));
     }
 
@@ -355,7 +355,7 @@ public final class ToastUtils {
      * @param duration 显示时长
      */
     private static void show(@StringRes int resId, int duration) {
-        show(MVVMApplication.application.getResources().getText(resId).toString(), duration);
+        show(MVVMApplication.mvvmApplication.getResources().getText(resId).toString(), duration);
     }
 
     /**
@@ -366,7 +366,7 @@ public final class ToastUtils {
      * @param args     参数
      */
     private static void show(@StringRes int resId, int duration, Object... args) {
-        show(String.format(MVVMApplication.application.getResources().getString(resId), args), duration);
+        show(String.format(MVVMApplication.mvvmApplication.getResources().getString(resId), args), duration);
     }
 
     /**
@@ -392,7 +392,7 @@ public final class ToastUtils {
         if (sViewWeakReference != null) {
             final View view = sViewWeakReference.get();
             if (view != null) {
-                sToast = new Toast(MVVMApplication.application);
+                sToast = new Toast(MVVMApplication.mvvmApplication);
                 sToast.setView(view);
                 sToast.setDuration(duration);
                 isCustom = true;
@@ -403,9 +403,9 @@ public final class ToastUtils {
                 SpannableString spannableString = new SpannableString(text);
                 ForegroundColorSpan colorSpan = new ForegroundColorSpan(messageColor);
                 spannableString.setSpan(colorSpan, 0, spannableString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                sToast = Toast.makeText(MVVMApplication.application, spannableString, duration);
+                sToast = Toast.makeText(MVVMApplication.mvvmApplication, spannableString, duration);
             } else {
-                sToast = Toast.makeText(MVVMApplication.application, text, duration);
+                sToast = Toast.makeText(MVVMApplication.mvvmApplication, text, duration);
             }
         }
         View view = sToast.getView();

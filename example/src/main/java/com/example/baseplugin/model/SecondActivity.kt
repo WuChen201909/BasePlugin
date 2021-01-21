@@ -1,9 +1,10 @@
 package com.example.baseplugin.model
 
-import com.harrison.plugin.mvvm.base.impl.ABaseActivityView
-import com.harrison.plugin.mvvm.base.impl.ABaseViewModel
+import com.example.baseplugin.R
+import com.harrison.plugin.mvvm.base.impl.BaseActivityView
+import com.harrison.plugin.mvvm.base.impl.BaseViewModel
 
-class SecondActivity : ABaseActivityView<ABaseViewModel>() {
+class SecondActivity : BaseActivityView<BaseViewModel>() {
     override fun initView() {
 
     }
@@ -20,8 +21,12 @@ class SecondActivity : ABaseActivityView<ABaseViewModel>() {
 
     }
 
-    override fun getViewModelClass(): Class<ABaseViewModel> {
-        return ABaseViewModel::class.java
+    override fun getViewModelClass(): Class<BaseViewModel> {
+        return BaseViewModel::class.java
+    }
+
+    override fun getViewLayout(): Any {
+        return R.layout.activity_second
     }
 
 

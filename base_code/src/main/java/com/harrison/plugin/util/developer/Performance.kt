@@ -407,7 +407,7 @@ object Performance {
         decorView.addView(showRootLayout)
         return {
             val totalMemory = (Runtime.getRuntime().totalMemory() * 1.0 / (1024 * 1024)).toFloat()
-            showView.text = "FPS:$it M:${DecimalFormat("#.00").format(Math.abs(totalMemory))}"
+            showView.text = "FPS:$it \nM:${DecimalFormat("#.00").format(Math.abs(totalMemory))}"
         }
     }
 

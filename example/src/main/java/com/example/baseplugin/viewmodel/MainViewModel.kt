@@ -4,10 +4,10 @@ import android.app.Application
 import android.util.Log
 import com.example.baseplugin.http.RetrofitManager
 import com.harrison.plugin.util.constant.HttpResponseCode
-import com.harrison.plugin.mvvm.base.impl.ABaseViewModel
+import com.harrison.plugin.mvvm.base.impl.BaseViewModel
 import com.harrison.plugin.mvvm.event.HttpLiveEvent
 
-class MainViewModel(application: Application) : ABaseViewModel(application) {
+class MainViewModel(application: Application) : BaseViewModel(application) {
 
     var httpLiveEvent = HttpLiveEvent<String>()
 

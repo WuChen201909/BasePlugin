@@ -12,7 +12,7 @@ import coil.load
 import com.bumptech.glide.Glide
 import com.example.baseplugin.R
 import com.example.baseplugin.viewmodel.MainViewModel
-import com.harrison.plugin.mvvm.base.impl.ABaseActivityView
+import com.harrison.plugin.mvvm.base.impl.BaseActivityView
 import com.harrison.plugin.util.developer.LogUtils
 import com.harrison.plugin.util.hardware.Memory
 import com.harrison.plugin.util.io.CoroutineUtils
@@ -26,13 +26,12 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.apache.lucene.util.RamUsageEstimator
 
 
-class MainActivity : ABaseActivityView<MainViewModel>() {
+class MainActivity : BaseActivityView<MainViewModel>() {
 
 
     override fun initView() {
 
         Performance.startCountTime("1")
-        setContentView(R.layout.activity_main)
         LogUtils.e("result", "count time:" + Performance.endCountTime("1"))
 
         button_jump_to_mvvm.setOnClickListener(onClickListener)
@@ -90,6 +89,10 @@ class MainActivity : ABaseActivityView<MainViewModel>() {
 
     override fun getViewModelClass(): Class<MainViewModel> {
         return MainViewModel::class.java
+    }
+
+    override fun getViewLayout(): Any {
+        return R.layout.activity_main
     }
 
 }

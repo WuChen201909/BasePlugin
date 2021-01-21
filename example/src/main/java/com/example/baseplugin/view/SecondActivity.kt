@@ -2,16 +2,16 @@ package com.example.baseplugin.view
 
 import androidx.appcompat.app.AppCompatActivity
 import com.example.baseplugin.R
-import com.harrison.plugin.mvvm.base.impl.ABaseActivityView
-import com.harrison.plugin.mvvm.base.impl.ABaseViewModel
+import com.harrison.plugin.mvvm.base.impl.BaseActivityView
+import com.harrison.plugin.mvvm.base.impl.BaseViewModel
 
-class SecondActivity: ABaseActivityView<ABaseViewModel>() {
-    override fun getViewModelClass(): Class<ABaseViewModel> {
-        return ABaseViewModel::class.java
+class SecondActivity: BaseActivityView<BaseViewModel>() {
+    override fun getViewModelClass(): Class<BaseViewModel> {
+        return BaseViewModel::class.java
     }
 
     override fun initView() {
-        setContentView(R.layout.activity_second)
+
     }
 
     override fun initViewObservable() {
@@ -24,6 +24,10 @@ class SecondActivity: ABaseActivityView<ABaseViewModel>() {
 
     override fun unBindViewModel() {
 
+    }
+
+    override fun getViewLayout(): Any {
+        return R.layout.activity_second
     }
 
 }

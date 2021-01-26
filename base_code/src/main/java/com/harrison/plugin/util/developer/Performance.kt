@@ -31,10 +31,9 @@ object Performance {
 
     private var isInit = false
 
-    private const val TIME_BLOCK: Int = 100 //阈值，doFrame超过当前阀值没有被调用则做为卡顿分析
+    private const val TIME_BLOCK: Int = 100 //阈值，doFrame超过当前阀值没有被调用则做为卡顿分析,超过30-40毫秒的事件需要优化
 
     private const val FREQUENCY = 10 //采样频率，表示超时部分采样多少次
-
 
     /**
      * @param analyze 是否打开性能分析

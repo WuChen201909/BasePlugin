@@ -13,4 +13,5 @@ interface ApiServer {
      */
     @GET("http://172.21.34.101:3000/app/info")
     suspend fun getInformationType(): JsonObject
+
 }

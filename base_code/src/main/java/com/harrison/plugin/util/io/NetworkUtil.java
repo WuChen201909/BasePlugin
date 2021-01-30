@@ -1,4 +1,4 @@
-package com.harrison.plugin.http;
+package com.harrison.plugin.util.io;
 
 import android.Manifest;
 import android.content.Context;

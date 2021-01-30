@@ -41,7 +41,7 @@ object Performance {
      * @param showFPSLog 是否打印FPS Log
      *
      */
-    fun init(application: Application?, analyze: Boolean, showFps: Boolean, showFPSLog: Boolean) {
+    fun init(application: Application?, showFps: Boolean, analyze: Boolean, showFPSLog: Boolean) {
         if (isInit) return
         doFrame()
         if (showFps && application != null) {

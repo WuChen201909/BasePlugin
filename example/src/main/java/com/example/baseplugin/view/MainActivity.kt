@@ -26,7 +26,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseActivityView<MainViewModel>() {
 
-    override fun viewCreated(){
+    override fun viewCreated() {
         Performance.startCountTime("1")
         LogUtils.e("result", "count time:" + Performance.endCountTime("1"))
 
@@ -39,8 +39,7 @@ class MainActivity : BaseActivityView<MainViewModel>() {
             LogUtils.i("网络请求状态 $state  $value")
         }
 
-     }
-
+    }
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -55,15 +54,15 @@ class MainActivity : BaseActivityView<MainViewModel>() {
 //                    windowManager.addView(view,params);
 
                 } else {
-                    Toast.makeText(this, "ACTION_MANAGE_OVERLAY_PERMISSION权限已被拒绝", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "ACTION_MANAGE_OVERLAY_PERMISSION权限已被拒绝",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
     }
-
-
-
-
 
 
     private var onClickListener = View.OnClickListener {
@@ -94,7 +93,7 @@ class MainActivity : BaseActivityView<MainViewModel>() {
                         val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
                         intent.data = Uri.parse("package:$packageName")
                         startActivityForResult(intent, 100)
-                    }else{
+                    } else {
                         val wmManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
                         val wmParams = WindowManager.LayoutParams()
 
@@ -105,14 +104,18 @@ class MainActivity : BaseActivityView<MainViewModel>() {
                         }
 //                      wmParams.type = WindowManager.LayoutParams.TYPE_PHONE // 设置window type
                         wmParams.format = PixelFormat.RGBA_8888 // 设置图片格式，效果为背景透明
-                        wmParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                        wmParams.flags =
+                            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
                         wmParams.gravity = Gravity.RIGHT or Gravity.CENTER_VERTICAL // 调整悬浮窗口至右侧中间
                         wmParams.x = 0 //以屏幕左上角为原点，设置x、y初始值
                         wmParams.y = 0
                         wmParams.width = WindowManager.LayoutParams.WRAP_CONTENT // 设置悬浮窗口长宽数据
 
                         var view = TextView(this)
-                        var layoutParameter = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                        var layoutParameter = ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                        )
                         view.layoutParams = layoutParameter
                         view.text = "悬浮窗测试"
 
@@ -132,15 +135,15 @@ class MainActivity : BaseActivityView<MainViewModel>() {
 
                 var rxPermissions: RxPermissions = RxPermissions(this);
                 rxPermissions
-                        .request(Manifest.permission.SYSTEM_ALERT_WINDOW)
-                        .subscribe { granted ->
-                            if (granted) { // Always true pre-M
+                    .request(Manifest.permission.SYSTEM_ALERT_WINDOW)
+                    .subscribe { granted ->
+                        if (granted) { // Always true pre-M
 
-                            } else {
-                                Toast.makeText(this, "没有权限", Toast.LENGTH_LONG).show()
+                        } else {
+                            Toast.makeText(this, "没有权限", Toast.LENGTH_LONG).show()
 //                              ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 20)
-                            }
                         }
+                    }
             }
         }
     }

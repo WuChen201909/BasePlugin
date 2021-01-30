@@ -11,22 +11,22 @@ import com.harrison.plugin.util.constant.HttpResponseCode
 class HttpLiveEvent<H> : SingleLiveEvent<HttpLiveEntity<H>>() {
 
     @MainThread
-    fun observe(owner: LifecycleOwner, function:(state: Int,value: H?)->Unit) {
+    fun observe(owner: LifecycleOwner, function: (state: Int, value: H?) -> Unit) {
         if (hasActiveObservers()) {
             Log.w(TAG, "Multiple observers registered but only one will be notified of changes.")
         }
         super.observe(owner, { t ->
-            if(t==null){
-                function(HttpResponseCode.HTTP_LOCAL_EMPTY,null)
-            }else{
-                function(t.state,t.data)
+            if (t == null) {
+                function(HttpResponseCode.HTTP_LOCAL_EMPTY, null)
+            } else {
+                function(t.state, t.data)
             }
         })
     }
 
     @MainThread
-    fun setValue(state:Int,value: H?){
-        super.setValue(HttpLiveEntity(state,value))
+    fun setValue(state: Int, value: H?) {
+        super.setValue(HttpLiveEntity(state, value))
     }
 
     companion object {
@@ -34,7 +34,7 @@ class HttpLiveEvent<H> : SingleLiveEvent<HttpLiveEntity<H>>() {
     }
 }
 
-class HttpLiveEntity<D>(state: Int,value: D?){
-    var state:Int = state
-    var data:D? = value
+class HttpLiveEntity<D>(state: Int, value: D?) {
+    var state: Int = state
+    var data: D? = value
 }

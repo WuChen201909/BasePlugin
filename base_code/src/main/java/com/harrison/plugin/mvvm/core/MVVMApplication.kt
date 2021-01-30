@@ -39,6 +39,7 @@ open abstract class MVVMApplication : Application() {
                 }
 
                 override fun onActivityPaused(p0: Activity) {
+
                 }
 
                 override fun onActivityStopped(p0: Activity) {

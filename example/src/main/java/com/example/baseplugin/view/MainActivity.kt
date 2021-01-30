@@ -16,7 +16,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.example.baseplugin.R
 import com.example.baseplugin.viewmodel.MainViewModel
-import com.harrison.plugin.mvvm.base.impl.BaseActivityView
+import com.harrison.plugin.mvvm.base.BaseActivityView
 import com.harrison.plugin.util.developer.LogUtils
 import com.harrison.plugin.util.hardware.Memory
 import com.kok.kuailong.utils.Performance
@@ -26,9 +26,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseActivityView<MainViewModel>() {
 
-
-    override fun initView() {
-
+    override fun viewCreated(){
         Performance.startCountTime("1")
         LogUtils.e("result", "count time:" + Performance.endCountTime("1"))
 
@@ -37,18 +35,12 @@ class MainActivity : BaseActivityView<MainViewModel>() {
         button_start_request.setOnClickListener(onClickListener)
         button_main_add_window.setOnClickListener(onClickListener)
 
+        viewModel.httpLiveEvent.observe(this) { state, value ->
+            LogUtils.i("网络请求状态 $state  $value")
+        }
 
-//        //计算指定对象及其引用树上的所有对象的综合大小，单位字节
-////        RamUsageEstimator.sizeOf(this)
-//
-//        //计算指定对象本身在堆空间的大小，单位字节
-////
-////        LogUtils.i("对象所占用内存大小  ${ RamUsageEstimator.shallowSizeOf(this)}")
-//
-//        //计算指定对象及其引用树上的所有对象的综合大小，返回可读的结果，如：2KB
-//        RamUsageEstimator.shallowSizeOfInstance(MainActivity::class.java)
+     }
 
-    }
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -69,19 +61,10 @@ class MainActivity : BaseActivityView<MainViewModel>() {
         }
     }
 
-    override fun initViewObservable() {
-        viewModel.httpLiveEvent.observe(this) { state, value ->
-            LogUtils.i("网络请求状态 $state  $value")
-        }
-    }
 
-    override fun bindViewModel() {
 
-    }
 
-    override fun unBindViewModel() {
 
-    }
 
     private var onClickListener = View.OnClickListener {
 

@@ -18,7 +18,7 @@ object IntentUtils {
         intent.component = component
         context.startActivity(intent)
     }
-
+    
     /**
      * 跳转到系统设置：开启辅助服
      */

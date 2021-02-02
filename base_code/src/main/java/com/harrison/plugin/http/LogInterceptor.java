@@ -28,6 +28,8 @@ import okio.BufferedSource;
 public class LogInterceptor implements Interceptor {
     private final Charset UTF8 = Charset.forName("UTF-8");
 
+    private final String TAG = "FORMAT";
+
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
@@ -48,8 +50,6 @@ public class LogInterceptor implements Interceptor {
             body = buffer.readString(charset);
         }
 
-        LogUtils.INSTANCE.e("发送请求\nmethod："+request.method()+"\nurl："+request.url()+"\nheaders: "+request.headers()+"body："+body);
-
         long startNs = System.nanoTime();
         Response response = chain.proceed(request);
         long tookMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs);
@@ -58,7 +58,7 @@ public class LogInterceptor implements Interceptor {
         String rBody = null;
 
         BufferedSource source = responseBody.source();
-        source.request(Long.MAX_VALUE); // Buffer the entire body.
+        source.request(Long.MAX_VALUE);  // Buffer the entire body.
         Buffer buffer = source.buffer();
 
         Charset charset = UTF8;
@@ -71,11 +71,20 @@ public class LogInterceptor implements Interceptor {
             }
         }
         rBody = buffer.clone().readString(charset);
-
-        LogUtils.INSTANCE.e("收到响应 \n code:"+response.code()+" msg："+response.message()
-                        +" \n响应时间"+tookMs+"\n请求url："+response.request().url()+"\n请求body:"+body);
-        printJson("FORMAT",rBody);
         
+        printLine(TAG, true);
+        Log.e(TAG, "║ " + "Request:");
+        Log.e(TAG, "║ " + "     method：" + request.method() );
+        Log.e(TAG, "║ " + "     url：" + request.url());
+        Log.e(TAG, "║ " + "     headers: " + request.headers());
+        Log.e(TAG, "║ " + "     body：" + body );
+        Log.e(TAG, "║ " + "Response:");
+        Log.e(TAG, "║ " + "     time：" + tookMs);
+        Log.e(TAG, "║ " + "     code:" + response.code());
+        Log.e(TAG, "║ " + "     msg：" + response.message());
+        Log.e(TAG, "║ " + "     body: ");
+        printJson(TAG, rBody);
+
         return response;
     }
 
@@ -90,9 +99,7 @@ public class LogInterceptor implements Interceptor {
     }
 
     public static void printJson(String tag, String msg) {
-
         String message;
-
         try {
             if (msg.startsWith("{")) {
                 JSONObject jsonObject = new JSONObject(msg);
@@ -106,12 +113,12 @@ public class LogInterceptor implements Interceptor {
         } catch (JSONException e) {
             message = msg;
         }
-
-        printLine(tag, true);
-        message =LINE_SEPARATOR + message;
+//        printLine(tag, true);
+        message = LINE_SEPARATOR + message;
         String[] lines = message.split(LINE_SEPARATOR);
         for (String line : lines) {
-            Log.e(tag, "║ " + line);
+            if(line.isEmpty())continue;
+            Log.e(tag, "║       " + line);
         }
         printLine(tag, false);
     }

@@ -38,6 +38,13 @@ class CustomAlertDialog : DialogFragment() {
 
         fun showDialog(
             fragmentManager: FragmentManager,
+            content: String
+        ) {
+            this.showDialog(fragmentManager,null, content, "确认", null, null, null, null, null)
+        }
+
+        fun showDialog(
+            fragmentManager: FragmentManager,
             content: String,
             btnS01: String,
             btn01: () -> Unit

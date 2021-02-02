@@ -38,9 +38,7 @@ class MainActivity : BaseActivityView<MainViewModel>() {
         viewModel.httpLiveEvent.observe(this) { state, value ->
             LogUtils.i("网络请求状态 $state  $value")
         }
-
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

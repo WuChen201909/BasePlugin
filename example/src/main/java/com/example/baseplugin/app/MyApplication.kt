@@ -14,7 +14,7 @@ class MyApplication : MVVMApplication() {
         LogUtils.i("打印日志")
 
         Performance.init(this, showFps = true, analyze = false, showFPSLog = false)
-        
+
     }
 
 }

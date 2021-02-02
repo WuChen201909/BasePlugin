@@ -1,18 +1,26 @@
 package com.harrison.plugin.mvvm.base
 
+import android.annotation.TargetApi
 import android.content.Context
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.LiveData
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import com.harrison.baseplugin.R
 import com.harrison.plugin.mvvm.core.MVVMApplication
-import com.harrison.plugin.mvvm.event.SingleLiveEvent
 import com.harrison.plugin.util.io.CoroutineUtils
 
 
@@ -20,9 +28,9 @@ import com.harrison.plugin.util.io.CoroutineUtils
  * 尽量保持 Android 原生结构
  *
  * */
-open abstract class BaseActivityView<T : BaseViewModel>   : AppCompatActivity() {
+open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
 
-    protected lateinit var viewModel: T
+    lateinit var viewModel: T
 
     abstract fun getViewModelClass(): Class<T>
     abstract fun getViewLayout(): Any
@@ -37,14 +45,16 @@ open abstract class BaseActivityView<T : BaseViewModel>   : AppCompatActivity() 
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(MVVMApplication.mvvmApplication)
         )
-        .get(getViewModelClass())
+            .get(getViewModelClass())
+
+        setTranslucentStatus()
 
         var view = getViewLayout()
         if (view is View) {
             setContentView(view)
             viewCreated()
         } else if (view is Int) {
-            viewCallBack.observe(this,{
+            viewCallBack.observe(this, {
                 setContentView(it)
                 viewCreated()
             })
@@ -56,6 +66,111 @@ open abstract class BaseActivityView<T : BaseViewModel>   : AppCompatActivity() 
         }
     }
 
+
+    /**
+     * ====================================================
+     * Fragment 堆栈管理
+     * ====================================================
+     */
+
+    var fragmentViewStack: MutableList<Fragment> = arrayListOf();
+
+    /**
+     * 回退栈
+     */
+    fun popNavigator() {
+        if (fragmentViewStack.size <= 0) { return }
+
+        var currentFragment = fragmentViewStack.last()
+        fragmentViewStack.remove(currentFragment)
+
+        var transaction = supportFragmentManager.beginTransaction()
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+        transaction.remove(currentFragment)
+        transaction.commit()
+
+        if (fragmentViewStack.size > 0) {
+            var currentFragment = fragmentViewStack.last()
+            transaction = supportFragmentManager.beginTransaction()
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            transaction.show(currentFragment)
+            transaction.commit()
+        }
+    }
+
+    /**
+     * 添加到栈
+     */
+    fun pushNavigator(fragment: Fragment) {
+
+        if (fragmentViewStack.size > 0) {
+            var currentFragment = fragmentViewStack.last()
+            var transaction = supportFragmentManager.beginTransaction()
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+            transaction.hide(currentFragment)
+            transaction.commit()
+        }
+
+        var transaction = supportFragmentManager.beginTransaction()
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+        fragmentViewStack.add(fragment)
+        transaction.add(android.R.id.content, fragment)
+        transaction.commit()
+    }
+
+    /**
+     * 拦截返回按钮实现栈回退
+     */
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (fragmentViewStack.size > 0) {
+                popNavigator()
+                return true
+            }
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
+
+    /**
+     * ====================================================
+     * 状态栏操作
+     * ====================================================
+     */
+
+    /**
+     * 设置状态栏透明 沉浸式
+     */
+    @TargetApi(19)
+    open fun setTranslucentStatus() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            //5.x开始需要把颜色设置透明，否则导航栏会呈现系统默认的浅灰色
+            val decorView = window.decorView
+            //两个 flag 要结合使用，表示让应用的主体内容占用系统状态栏的空间
+            decorView.systemUiVisibility =
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            decorView.systemUiVisibility =
+                decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            window.statusBarColor = Color.TRANSPARENT
+            //导航栏颜色也可以正常设置
+            //window.setNavigationBarColor(Color.TRANSPARENT);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            val attributes = window.attributes
+            val flagTranslucentStatus = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+            attributes.flags = attributes.flags or flagTranslucentStatus
+            //int flagTranslucentNavigation = WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
+            //attributes.flags |= flagTranslucentNavigation;
+            window.attributes = attributes
+        }
+    }
+
+
+    /**
+     * ===========================================================
+     * 软键盘配置操作
+     * ===========================================================
+     */
 
     /**
      * 点击软键盘之外的空白处，隐藏软件盘
@@ -86,7 +201,7 @@ open abstract class BaseActivityView<T : BaseViewModel>   : AppCompatActivity() 
         return true
     }
 
-    private  fun isShouldHide(v: View?, event: MotionEvent): Boolean {
+    private fun isShouldHide(v: View?, event: MotionEvent): Boolean {
         //这里是用常用的EditText作判断参照的,可根据情况替换成其它View
         if (v != null &&
             (v is EditText || v is Button)
@@ -102,8 +217,6 @@ open abstract class BaseActivityView<T : BaseViewModel>   : AppCompatActivity() 
         }
         return false
     }
-
-
 
 
 }

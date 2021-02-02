@@ -40,15 +40,17 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        // 配置ViewModel
         viewModel = ViewModelProvider(
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(MVVMApplication.mvvmApplication)
         )
             .get(getViewModelClass())
 
+        //配置浸入式状态栏
         setTranslucentStatus()
 
+        //加载显示视图
         var view = getViewLayout()
         if (view is View) {
             setContentView(view)
@@ -85,14 +87,14 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
         fragmentViewStack.remove(currentFragment)
 
         var transaction = supportFragmentManager.beginTransaction()
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)  //表示使用打开的动画 并不表示打开页面
         transaction.remove(currentFragment)
         transaction.commit()
 
         if (fragmentViewStack.size > 0) {
             var currentFragment = fragmentViewStack.last()
             transaction = supportFragmentManager.beginTransaction()
-            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)  // 表示使用关闭的动画  并不表示关闭页面
             transaction.show(currentFragment)
             transaction.commit()
         }
@@ -101,7 +103,14 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
     /**
      * 添加到栈
      */
-    fun pushNavigator(fragment: Fragment) {
+    fun pushNavigator(fragment: Fragment){
+        this.pushNavigator(fragment,null)
+    }
+
+    /**
+     * 添加到栈  带参数
+     */
+    fun pushNavigator(fragment: Fragment,bundle: Bundle?) {
 
         if (fragmentViewStack.size > 0) {
             var currentFragment = fragmentViewStack.last()
@@ -110,6 +119,8 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
             transaction.hide(currentFragment)
             transaction.commit()
         }
+
+        bundle?.let { fragment.arguments = it }
 
         var transaction = supportFragmentManager.beginTransaction()
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)

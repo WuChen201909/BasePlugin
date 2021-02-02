@@ -16,6 +16,10 @@ import com.harrison.baseplugin.R
 
 /**
  * 自定义loadingView,实现网络状态
+ *
+ * 使用方式
+ *   调用后将会把状态视图填充到屏幕上
+ *   LoadingView.fillInLayout(contentView)
  */
 class LoadingView : LinearLayout, View.OnClickListener {
     private var imageView: ImageView? = null
@@ -25,8 +29,6 @@ class LoadingView : LinearLayout, View.OnClickListener {
     private var mView: View? = null
     private var ll_kong: View? = null
     private var mListener: OnRefreshListener? = null
-
-
 
     companion object {
         const val LOADING = 0 //加载中

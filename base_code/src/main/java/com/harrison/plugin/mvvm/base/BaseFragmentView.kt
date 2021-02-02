@@ -73,7 +73,6 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
         fragmentContent.addView(view)
     }
 
-
     /**
      * ====================================================
      * Fragment 堆栈管理
@@ -87,12 +86,17 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
         return false
     }
 
+
     /**
      * 显示其他内容到栈中
      */
     fun pushNavigator(fragment: Fragment) {
+        this.pushNavigator(fragment,null)
+    }
+
+    fun pushNavigator(fragment: Fragment,bundle: Bundle?){
         if (isStackModel() && requireActivity() is BaseActivityView<*>) {
-            (requireActivity() as BaseActivityView<*>).pushNavigator(fragment)
+            (requireActivity() as BaseActivityView<*>).pushNavigator(fragment,bundle)
         }
     }
 
@@ -109,6 +113,13 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
      * ====================================================
      * Fragment 进出效果
      * ====================================================
+     */
+
+    /**
+     * 重写出入场动画创建函数
+     *  @param transit 动画类型
+     *  @param enter 当前Activity是进入还是退出
+     *  @param nextAnim
      */
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
         var animation: TranslateAnimation? = null

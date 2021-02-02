@@ -85,14 +85,14 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
         fragmentViewStack.remove(currentFragment)
 
         var transaction = supportFragmentManager.beginTransaction()
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         transaction.remove(currentFragment)
         transaction.commit()
 
         if (fragmentViewStack.size > 0) {
             var currentFragment = fragmentViewStack.last()
             transaction = supportFragmentManager.beginTransaction()
-            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
             transaction.show(currentFragment)
             transaction.commit()
         }

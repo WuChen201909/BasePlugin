@@ -90,8 +90,8 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
     /**
      * 显示其他内容到栈中
      */
-    fun pushNavigator(fragment: Fragment){
-        if(isStackModel() && requireActivity() is BaseActivityView<*>){
+    fun pushNavigator(fragment: Fragment) {
+        if (isStackModel() && requireActivity() is BaseActivityView<*>) {
             (requireActivity() as BaseActivityView<*>).pushNavigator(fragment)
         }
     }
@@ -99,8 +99,8 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
     /**
      * 将自己退出显示栈
      */
-    fun popNavigator(){
-        if(isStackModel() && requireActivity() is BaseActivityView<*>){
+    fun popNavigator() {
+        if (isStackModel() && requireActivity() is BaseActivityView<*>) {
             (requireActivity() as BaseActivityView<*>).popNavigator()
         }
     }
@@ -110,26 +110,24 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
      * Fragment 进出效果
      * ====================================================
      */
-    
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
         var animation: TranslateAnimation? = null
-        LogUtils.i("进入状态"+enter)
-        if (transit == FragmentTransaction.TRANSIT_FRAGMENT_OPEN) {
-            if(enter){
+        if (enter) {
+            if(transit == FragmentTransaction.TRANSIT_FRAGMENT_OPEN){
                 animation = TranslateAnimation(
                     Animation.RELATIVE_TO_SELF, 1f, Animation.RELATIVE_TO_SELF, 0f,
                     Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f
                 )
             }else{
                 animation = TranslateAnimation(
-                    Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 1f,
+                    Animation.RELATIVE_TO_SELF, -1f, Animation.RELATIVE_TO_SELF, 0f,
                     Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f
                 )
             }
-        } else if (FragmentTransaction.TRANSIT_FRAGMENT_CLOSE === transit) {
-            if(enter){
+        } else {
+            if(transit == FragmentTransaction.TRANSIT_FRAGMENT_OPEN){
                 animation = TranslateAnimation(
-                    Animation.RELATIVE_TO_SELF, -1f, Animation.RELATIVE_TO_SELF, 1f,
+                    Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 1f,
                     Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f
                 )
             }else{
@@ -137,16 +135,13 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
                     Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, -1f,
                     Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f
                 )
-
             }
-
         }
         if (animation == null) {
             animation = TranslateAnimation(0f, 0f, 0f, 0f)
         }
-        animation.setDuration(1000)
+        animation.setDuration(100)
         return animation
     }
-
 
 }

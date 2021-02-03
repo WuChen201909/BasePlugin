@@ -22,12 +22,16 @@ dependencies {
     //异步处理方案
     api 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9'
 
+
     //本地事件分发
     api 'org.greenrobot:eventbus:3.2.0'
 
     //图片加载
     api("io.coil-kt:coil:1.0.0")//加载图片
     api("io.coil-kt:coil-gif:1.0.0")//显示gif
+
+    //图片裁剪
+    implementation 'com.github.yalantis:ucrop:2.2.6'
 
 
 //    testImplementation 'junit:junit:4.13.1'

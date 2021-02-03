@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.harrison.baseplugin">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.harrison.baseplugin"
+    >
 
+    <!-- 网络请求权限  -->
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
-
+    <!-- 网络状态读取权限   -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
+    <!--  悬浮窗权限  -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- FileProvider 需要权限   -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+    <!--  使用摄像头权限   -->
+    <uses-permission android:name="android.permission.CAMERA"></uses-permission>
 
     <application
         android:supportsRtl="true"
@@ -15,11 +25,28 @@
 
         <activity android:name="com.harrison.plugin.util.developer.crash.DefaultErrorActivity"></activity>
 
+        <!--         异常捕获-->
         <provider
             android:name="com.harrison.plugin.util.developer.crash.CaocInitProvider"
             android:authorities="${applicationId}.customactivityoncrashinitprovider"
             android:exported="false"
             android:initOrder="101" />
+
+
+        <!--  获取并截取图片工具  -->
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
 
     </application>
 

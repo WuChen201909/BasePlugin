@@ -15,7 +15,9 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
+//        consumerProguardFiles "consumer-rules.pro"
+
+//        manifestPlaceholders = [applicationId:"www.example.com"]
 
         multiDexEnabled true
     }

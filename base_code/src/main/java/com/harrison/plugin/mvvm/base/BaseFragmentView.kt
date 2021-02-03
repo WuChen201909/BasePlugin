@@ -110,6 +110,13 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
     }
 
     /**
+     * 获取根Activity
+     */
+    fun superBaseActivity():BaseActivityView<*>{
+        return  requireActivity() as BaseActivityView<*>
+    }
+
+    /**
      * ====================================================
      * Fragment 进出效果
      * ====================================================

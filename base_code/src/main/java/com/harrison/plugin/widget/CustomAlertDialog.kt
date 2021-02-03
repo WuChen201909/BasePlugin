@@ -32,24 +32,28 @@ class CustomAlertDialog : DialogFragment() {
     var title: String? = null // 显示标题
     var content: String? = null // 对话框显示内容
 
+    var canCancle = false //默认不可取消
+
     var actionList: MutableList<DialogAction> = arrayListOf()
 
     companion object {
 
         fun showDialog(
             fragmentManager: FragmentManager,
-            content: String
+            content: String,
+            canCancle:Boolean = false
         ) {
-            this.showDialog(fragmentManager,null, content, "确认", null, null, null, null, null)
+            this.showDialog(fragmentManager,null, content, "确认", null, null, null, null, null,canCancle)
         }
 
         fun showDialog(
             fragmentManager: FragmentManager,
             content: String,
             btnS01: String,
-            btn01: () -> Unit
+            btn01: () -> Unit,
+            canCancle:Boolean = false
         ) {
-            this.showDialog(fragmentManager,null, content, btnS01, btn01, null, null, null, null)
+            this.showDialog(fragmentManager,null, content, btnS01, btn01, null, null, null, null,canCancle)
         }
 
         fun showDialog(
@@ -58,9 +62,10 @@ class CustomAlertDialog : DialogFragment() {
             btnS01: String,
             btn01: () -> Unit,
             btnS02: String,
-            btn02: () -> Unit
+            btn02: () -> Unit,
+            canCancle:Boolean = false
         ) {
-            this.showDialog(fragmentManager,null, content, btnS01, btn01, btnS02, btn02, null, null)
+            this.showDialog(fragmentManager,null, content, btnS01, btn01, btnS02, btn02, null, null,canCancle)
         }
         fun showDialog(
             fragmentManager: FragmentManager,
@@ -70,9 +75,10 @@ class CustomAlertDialog : DialogFragment() {
             btnS02: String?,
             btn02: (() -> Unit)?,
             btnS03: String?,
-            btn03: (() -> Unit)?
+            btn03: (() -> Unit)?,
+            canCancle:Boolean = false
         ) {
-            this.showDialog(fragmentManager,null, content, btnS01, btn01, btnS02, btn02, btnS03, btn03)
+            this.showDialog(fragmentManager,null, content, btnS01, btn01, btnS02, btn02, btnS03, btn03,canCancle)
         }
 
         fun showDialog(
@@ -80,10 +86,11 @@ class CustomAlertDialog : DialogFragment() {
             title: String,
             content: String,
             btnS01: String,
-            btn01: () -> Unit
+            btn01: () -> Unit,
+            canCancle:Boolean = false
         ) {
 
-            this.showDialog(fragmentManager,title, content, btnS01, btn01, null, null, null, null)
+            this.showDialog(fragmentManager,title, content, btnS01, btn01, null, null, null, null,canCancle)
         }
 
         fun showDialog(
@@ -93,9 +100,10 @@ class CustomAlertDialog : DialogFragment() {
             btnS01: String,
             btn01: () -> Unit,
             btnS02: String,
-            btn02: () -> Unit
+            btn02: () -> Unit,
+            canCancle:Boolean = false
         ) {
-            this.showDialog(fragmentManager,title, content, btnS01, btn01, btnS02, btn02, null, null)
+            this.showDialog(fragmentManager,title, content, btnS01, btn01, btnS02, btn02, null, null,canCancle)
         }
 
         fun showDialog(
@@ -107,11 +115,12 @@ class CustomAlertDialog : DialogFragment() {
             btnS02: String?,
             btn02: (() -> Unit)?,
             btnS03: String?,
-            btn03: (() -> Unit)?
+            btn03: (() -> Unit)?,
+            canCancle:Boolean = false
         ) {
             var customAlertDialog: CustomAlertDialog = CustomAlertDialog()
             customAlertDialog.content = content
-
+            customAlertDialog.canCancle = canCancle
             if(title != null){
                 customAlertDialog.title = title
             }
@@ -167,7 +176,7 @@ class CustomAlertDialog : DialogFragment() {
         measureSize()
 
 
-        var cancle = actionList.size == 0 // 没有按钮时可以取消
+        var cancle = actionList.size == 0 || canCancle // 没有按钮时可以取消
         //配置当前对话框
         dialog?.let {
             it.setCanceledOnTouchOutside(cancle)
@@ -236,7 +245,7 @@ class CustomAlertDialog : DialogFragment() {
         contentView.textSize = 13f
         contentLayout.addView(contentView)
 
-        if (!cancle) {
+        if (actionList.size != 0) {
             var dividerView = View(requireContext())
             var dividerLayoutParame =
                 ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1)

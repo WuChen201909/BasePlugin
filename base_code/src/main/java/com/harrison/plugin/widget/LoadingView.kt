@@ -8,10 +8,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 import com.harrison.baseplugin.R
 
 /**
@@ -35,17 +32,31 @@ class LoadingView : LinearLayout, View.OnClickListener {
         const val STOP_LOADING = 1 //停止加载
         const val NO_DATA = 2 //无数据
         const val NO_NETWORK = 3 //无网络
-        const val GONE = 0 //隐藏
+        const val GONE = 8 //隐藏
         const val LOADING_DIALOG = 5
+
         // 把加载视图注入到布局中
         fun fillInLayout(layout: ViewGroup): LoadingView {
+
+            var parent :ViewGroup = layout.parent as ViewGroup
+            parent.removeView(layout)
+
+            var contentView = FrameLayout(layout.context)
+            var contentLayoutParam = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT)
+            contentView.layoutParams = contentLayoutParam
+
+            contentView.addView(layout)
+
             val loadingView = LoadingView(layout.context)
             val layoutParams: ViewGroup.LayoutParams = LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
             loadingView.layoutParams = layoutParams
-            layout.addView(loadingView)
+            contentView.addView(loadingView)
+
+            parent.addView(contentView)
+
             return loadingView
         }
     }

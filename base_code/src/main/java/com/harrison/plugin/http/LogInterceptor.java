@@ -37,7 +37,7 @@ public class LogInterceptor implements Interceptor {
         RequestBody requestBody = request.body();
 
         String body = null;
-
+        
         if (requestBody != null) {
             Buffer buffer = new Buffer();
             requestBody.writeTo(buffer);
@@ -71,17 +71,17 @@ public class LogInterceptor implements Interceptor {
             }
         }
         rBody = buffer.clone().readString(charset);
-        
+
         printLine(TAG, true);
         Log.e(TAG, "║ " + "Request:");
-        Log.e(TAG, "║ " + "     method：" + request.method() );
-        Log.e(TAG, "║ " + "     url：" + request.url());
+        Log.e(TAG, "║ " + "     method:" + request.method() );
+        Log.e(TAG, "║ " + "     url:" + request.url());
         Log.e(TAG, "║ " + "     headers: " + request.headers());
-        Log.e(TAG, "║ " + "     body：" + body );
+        Log.e(TAG, "║ " + "     body:" + body );
         Log.e(TAG, "║ " + "Response:");
-        Log.e(TAG, "║ " + "     time：" + tookMs);
+        Log.e(TAG, "║ " + "     time:" + tookMs);
         Log.e(TAG, "║ " + "     code:" + response.code());
-        Log.e(TAG, "║ " + "     msg：" + response.message());
+        Log.e(TAG, "║ " + "     msg:" + response.message());
         Log.e(TAG, "║ " + "     body: ");
         printJson(TAG, rBody);
 

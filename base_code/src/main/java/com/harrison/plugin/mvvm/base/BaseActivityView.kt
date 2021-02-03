@@ -2,6 +2,7 @@ package com.harrison.plugin.mvvm.base
 
 import android.annotation.TargetApi
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -12,15 +13,13 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
-import android.widget.FrameLayout
-import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
-import com.harrison.baseplugin.R
 import com.harrison.plugin.mvvm.core.MVVMApplication
+import com.harrison.plugin.util.developer.LogUtils
 import com.harrison.plugin.util.io.CoroutineUtils
 
 
@@ -81,7 +80,9 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
      * 回退栈
      */
     fun popNavigator() {
-        if (fragmentViewStack.size <= 0) { return }
+        if (fragmentViewStack.size <= 0) {
+            return
+        }
 
         var currentFragment = fragmentViewStack.last()
         fragmentViewStack.remove(currentFragment)
@@ -103,14 +104,14 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
     /**
      * 添加到栈
      */
-    fun pushNavigator(fragment: Fragment){
-        this.pushNavigator(fragment,null)
+    fun pushNavigator(fragment: Fragment) {
+        this.pushNavigator(fragment, null)
     }
 
     /**
      * 添加到栈  带参数
      */
-    fun pushNavigator(fragment: Fragment,bundle: Bundle?) {
+    fun pushNavigator(fragment: Fragment, bundle: Bundle?) {
 
         if (fragmentViewStack.size > 0) {
             var currentFragment = fragmentViewStack.last()
@@ -229,5 +230,55 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
         return false
     }
 
+    /**
+     * ===========================================================
+     * 事件管理 ， 处理非UI生命周期事件
+     * ===========================================================
+     */
+
+    var activityResultAction = MutableLiveData<Intent>()
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?){
+        super.onActivityResult(requestCode, resultCode, data)
+        responseRequestAction(requestCode,resultCode,data)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        var data = Intent()
+        var bundle = Bundle()
+        bundle.putStringArray("permissions",permissions)
+        bundle.putIntArray("grantResults",grantResults)
+        data.putExtras(bundle)
+        responseRequestAction(requestCode,0,data)
+    }
+
+
+    private fun responseRequestAction( requestCode: Int, resultCode: Int,
+                                       data: Intent?){
+        var result: Intent =
+            if (data == null) {
+                Intent()
+            } else {
+                data
+            }
+
+        var bundle: Bundle = if (intent.extras == null) {
+            Bundle()
+        } else {
+            intent.extras!!
+        }
+
+        bundle.putInt("requestCode", requestCode)
+        bundle.putInt("resultCode", resultCode)
+
+        result.putExtras(bundle)
+
+        activityResultAction.value = result
+    }
 
 }

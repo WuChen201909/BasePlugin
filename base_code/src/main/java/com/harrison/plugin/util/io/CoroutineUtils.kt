@@ -14,6 +14,7 @@ import java.lang.Exception
  * 携程封装工具类
  */
 object CoroutineUtils {
+
     var exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         LogUtils.printException(throwable)
     }

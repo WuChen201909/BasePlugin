@@ -20,6 +20,8 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.harrison.plugin.mvvm.base.BaseActivityView
+import com.harrison.plugin.mvvm.base.BaseFragmentView
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -35,6 +37,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Note that only one observer is going to be notified of changes.
  */
 open class SingleLiveEvent<T> : MutableLiveData<T?>() {
+
     private val mPending = AtomicBoolean(false)
 
     @MainThread
@@ -49,6 +52,10 @@ open class SingleLiveEvent<T> : MutableLiveData<T?>() {
                 observer.onChanged(t)
             }
         })
+    }
+
+    fun isFrontTask(){
+
     }
 
     @MainThread

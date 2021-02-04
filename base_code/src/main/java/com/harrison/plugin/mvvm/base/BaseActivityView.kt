@@ -1,15 +1,13 @@
 package com.harrison.plugin.mvvm.base
 
 import android.annotation.TargetApi
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.view.KeyEvent
-import android.view.MotionEvent
-import android.view.View
-import android.view.WindowManager
+import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
@@ -21,6 +19,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.harrison.plugin.mvvm.core.MVVMApplication
 import com.harrison.plugin.util.developer.LogUtils
 import com.harrison.plugin.util.io.CoroutineUtils
+import java.lang.reflect.Field
+import java.lang.reflect.Method
 
 
 /**
@@ -90,6 +90,7 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
         var transaction = supportFragmentManager.beginTransaction()
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)  //表示使用打开的动画 并不表示打开页面
         transaction.remove(currentFragment)
+        currentFragment.onPause()  //调用对应生命周期
         transaction.commit()
 
         if (fragmentViewStack.size > 0) {
@@ -97,6 +98,7 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
             transaction = supportFragmentManager.beginTransaction()
             transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)  // 表示使用关闭的动画  并不表示关闭页面
             transaction.show(currentFragment)
+            currentFragment.onResume()  //调用对应生命周期
             transaction.commit()
         }
     }
@@ -118,6 +120,7 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
             var transaction = supportFragmentManager.beginTransaction()
             transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
             transaction.hide(currentFragment)
+            currentFragment.onPause()  //调用对应生命周期
             transaction.commit()
         }
 
@@ -127,7 +130,10 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         fragmentViewStack.add(fragment)
         transaction.add(android.R.id.content, fragment)
+        fragment.onResume()  //调用对应生命周期
         transaction.commit()
+
+
     }
 
     /**
@@ -153,28 +159,49 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
     /**
      * 设置状态栏透明 沉浸式
      */
-    @TargetApi(19)
     open fun setTranslucentStatus() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            //5.x开始需要把颜色设置透明，否则导航栏会呈现系统默认的浅灰色
-            val decorView = window.decorView
-            //两个 flag 要结合使用，表示让应用的主体内容占用系统状态栏的空间
-            decorView.systemUiVisibility =
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            LogUtils.i("设置SDK大于30的状态栏")
+
+        } else if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)) {
+            LogUtils.i("设置SDK大于19的状态栏")
+            //绘制状态栏背景色
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            window.statusBarColor = Color.TRANSPARENT  //设置状态栏颜色为透明
+
+            var decorView = window.decorView
             decorView.systemUiVisibility =
-                decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            window.statusBarColor = Color.TRANSPARENT
-            //导航栏颜色也可以正常设置
-            //window.setNavigationBarColor(Color.TRANSPARENT);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            val attributes = window.attributes
-            val flagTranslucentStatus = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
-            attributes.flags = attributes.flags or flagTranslucentStatus
-            //int flagTranslucentNavigation = WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
-            //attributes.flags |= flagTranslucentNavigation;
-            window.attributes = attributes
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or  //全屏模式
+                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or // 设置为浅色模式
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE  // 状态栏覆盖在内容上方
         }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            //5.x开始需要把颜色设置透明，否则导航栏会呈现系统默认的浅灰色
+//            val decorView = window.decorView
+//            //两个 flag 要结合使用，表示让应用的主体内容占用系统状态栏的空间
+//            decorView.systemUiVisibility =
+//                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+//            decorView.systemUiVisibility =
+//                decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+//            window.statusBarColor = Color.TRANSPARENT
+//            //导航栏颜色也可以正常设置
+//            window.setNavigationBarColor(Color.TRANSPARENT);
+//        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//            val attributes = window.attributes
+//            val flagTranslucentStatus = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+//            attributes.flags = attributes.flags or flagTranslucentStatus
+//            //int flagTranslucentNavigation = WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
+//            //attributes.flags |= flagTranslucentNavigation;
+//
+//            window.decorView.systemUiVisibility =
+//                window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+//            window.statusBarColor = Color.TRANSPARENT
+//
+//            window.attributes = attributes
+//        }
+
+
     }
 
 
@@ -238,9 +265,9 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
 
     var activityResultAction = MutableLiveData<Intent>()
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?){
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        responseRequestAction(requestCode,resultCode,data)
+        responseRequestAction(requestCode, resultCode, data)
     }
 
     override fun onRequestPermissionsResult(
@@ -251,15 +278,17 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         var data = Intent()
         var bundle = Bundle()
-        bundle.putStringArray("permissions",permissions)
-        bundle.putIntArray("grantResults",grantResults)
+        bundle.putStringArray("permissions", permissions)
+        bundle.putIntArray("grantResults", grantResults)
         data.putExtras(bundle)
-        responseRequestAction(requestCode,0,data)
+        responseRequestAction(requestCode, 0, data)
     }
 
 
-    private fun responseRequestAction( requestCode: Int, resultCode: Int,
-                                       data: Intent?){
+    private fun responseRequestAction(
+        requestCode: Int, resultCode: Int,
+        data: Intent?
+    ) {
         var result: Intent =
             if (data == null) {
                 Intent()

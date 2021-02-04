@@ -37,16 +37,16 @@ class LoadingView : LinearLayout, View.OnClickListener {
 
         // 把加载视图注入到布局中
         fun fillInLayout(layout: ViewGroup): LoadingView {
-
+            // 获取指定控件的父控件
             var parent :ViewGroup = layout.parent as ViewGroup
-            parent.removeView(layout)
-
+            parent.removeView(layout) //将控件本身移除
+            //添加一个容器控件 为了方便加载视图压在内容上方
             var contentView = FrameLayout(layout.context)
             var contentLayoutParam = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT)
             contentView.layoutParams = contentLayoutParam
-
+            //添加回内容到容器
             contentView.addView(layout)
-
+            //添加加载视图到容器
             val loadingView = LoadingView(layout.context)
             val layoutParams: ViewGroup.LayoutParams = LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -89,7 +89,7 @@ class LoadingView : LinearLayout, View.OnClickListener {
         val inflater = context
             .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         var  mView = inflater.inflate(R.layout.loading_layout, this)
-        mView.setBackgroundColor(Color.parseColor("#224f4f4f"))
+        mView.setBackgroundColor(Color.parseColor("#22FFFFFF"))
         imageView = mView.findViewById<View>(R.id.iv_loading) as ImageView
         mLlLoading = mView.findViewById<View>(R.id.ll_loading) as LinearLayout
         ll_kong = mView.findViewById<View>(R.id.ll_kong) as LinearLayout

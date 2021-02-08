@@ -50,6 +50,8 @@ public class LogInterceptor implements Interceptor {
             body = buffer.readString(charset);
         }
 
+        Log.e(TAG, "║ " + "     url:" + request.url());
+
         long startNs = System.nanoTime();
         Response response = chain.proceed(request);
         long tookMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs);

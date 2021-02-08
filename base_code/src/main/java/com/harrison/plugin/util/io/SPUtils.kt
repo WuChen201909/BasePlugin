@@ -1,4 +1,4 @@
-package com.harrison.plugin.util.component
+package com.harrison.plugin.util.io
 
 import android.content.Context
 import android.content.SharedPreferences

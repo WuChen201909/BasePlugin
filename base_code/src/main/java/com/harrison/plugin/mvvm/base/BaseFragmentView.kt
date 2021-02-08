@@ -86,17 +86,25 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
         return false
     }
 
-
-    /**
-     * 显示其他内容到栈中
-     */
-    fun pushNavigator(fragment: Fragment) {
-        this.pushNavigator(fragment,null)
+    fun pushNavigator(fragment: Fragment,isAnimation:Boolean = true) {
+        this.pushNavigator(fragment, null,isAnimation)
     }
 
-    fun pushNavigator(fragment: Fragment,bundle: Bundle?){
+    fun pushNavigator(fragment: Fragment, bundle: Bundle?,isAnimation:Boolean = true) {
         if (isStackModel() && requireActivity() is BaseActivityView<*>) {
-            (requireActivity() as BaseActivityView<*>).pushNavigator(fragment,bundle)
+            (requireActivity() as BaseActivityView<*>).pushNavigator(fragment, bundle,isAnimation)
+        }
+    }
+
+    /**
+     * 清除之前栈中的页面以第一个页面的方式加载
+     */
+    fun newNavigator(fragment: Fragment,isAnimation:Boolean = true){
+        this.newNavigator(fragment, null,isAnimation)
+    }
+    fun newNavigator(fragment: Fragment, bundle: Bundle?,isAnimation:Boolean = true){
+        if (isStackModel() && requireActivity() is BaseActivityView<*>) {
+            (requireActivity() as BaseActivityView<*>).newNavigator(fragment, bundle,isAnimation)
         }
     }
 
@@ -112,8 +120,8 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
     /**
      * 获取根Activity
      */
-    fun superBaseActivity():BaseActivityView<*>{
-        return  requireActivity() as BaseActivityView<*>
+    fun superBaseActivity(): BaseActivityView<*> {
+        return requireActivity() as BaseActivityView<*>
     }
 
     /**
@@ -121,6 +129,9 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
      * Fragment 进出效果
      * ====================================================
      */
+
+    var intoAnimation = true
+    var outofAnimation = true
 
     /**
      * 重写出入场动画创建函数
@@ -130,25 +141,25 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
      */
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
         var animation: TranslateAnimation? = null
-        if (enter) {
-            if(transit == FragmentTransaction.TRANSIT_FRAGMENT_OPEN){
+        if (enter && intoAnimation) {
+            if (transit == FragmentTransaction.TRANSIT_FRAGMENT_OPEN) {
                 animation = TranslateAnimation(
                     Animation.RELATIVE_TO_SELF, 1f, Animation.RELATIVE_TO_SELF, 0f,
                     Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f
                 )
-            }else{
+            } else {
                 animation = TranslateAnimation(
                     Animation.RELATIVE_TO_SELF, -1f, Animation.RELATIVE_TO_SELF, 0f,
                     Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f
                 )
             }
-        } else {
-            if(transit == FragmentTransaction.TRANSIT_FRAGMENT_OPEN){
+        } else if (outofAnimation) {
+            if (transit == FragmentTransaction.TRANSIT_FRAGMENT_OPEN) {
                 animation = TranslateAnimation(
                     Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 1f,
                     Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f
                 )
-            }else{
+            } else {
                 animation = TranslateAnimation(
                     Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, -1f,
                     Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f
@@ -157,8 +168,10 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
         }
         if (animation == null) {
             animation = TranslateAnimation(0f, 0f, 0f, 0f)
+            animation.setDuration(100)
         }
         animation.setDuration(100)
+
         return animation
     }
 

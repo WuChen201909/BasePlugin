@@ -194,9 +194,8 @@ class CustomAlertDialog : DialogFragment() {
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
         backgroundLayout.layoutParams = layoutParams
-
         backgroundLayout.background = fullRadDrawable()
-
+    
         //设置内容布局
         var contentLayout: LinearLayout = LinearLayout(requireContext())
         var marginLayoutParams = ViewGroup.MarginLayoutParams(

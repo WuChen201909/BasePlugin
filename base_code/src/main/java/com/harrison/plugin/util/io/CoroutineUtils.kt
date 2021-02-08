@@ -1,6 +1,7 @@
 package com.harrison.plugin.util.io
 
 import android.content.Context
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import com.harrison.plugin.util.developer.LogUtils
@@ -8,6 +9,7 @@ import kotlinx.coroutines.*
 import org.json.JSONException
 import java.io.IOException
 import java.lang.Exception
+import kotlin.coroutines.CoroutineContext
 
 
 /**
@@ -15,7 +17,7 @@ import java.lang.Exception
  */
 object CoroutineUtils {
 
-    var exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+    var exceptionHandler = CoroutineExceptionHandler { _ , throwable ->
         LogUtils.printException(throwable)
     }
     var IOScope: CoroutineScope =

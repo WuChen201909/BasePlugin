@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import com.harrison.plugin.mvvm.core.MVVMApplication
+import com.harrison.plugin.mvvm.event.SingleLiveEvent
 import com.harrison.plugin.util.developer.LogUtils
 import com.harrison.plugin.util.io.CoroutineUtils
 
@@ -23,7 +24,7 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
 
     lateinit var fragmentContent: FrameLayout
 
-    var viewCallBack = MutableLiveData<View>()
+    var viewCallBack = SingleLiveEvent<View>()
 
     abstract fun getViewModelClass(): Class<T>
     abstract fun getViewLayout(): Any
@@ -53,15 +54,24 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
             viewCreated()
         } else if (view is Int) {
             viewCallBack.observe(this, {
-                addToContentView(it)
+                addToContentView(it!!)
+
+                LogUtils.i("加载界面成功02")
                 viewCreated()
             })
+            LogUtils.i("开始加载界面")
             CoroutineUtils.launchLayout(requireContext(), view, {
+                LogUtils.i("加载界面成功01")
                 viewCallBack.value = it
             })
         } else {
             throw Exception("please set view layout on this page")
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        fragmentContent.removeAllViews()
     }
 
     private fun addToContentView(view: View) {
@@ -140,6 +150,9 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
      *  @param nextAnim
      */
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
+        if(transit == FragmentTransaction.TRANSIT_NONE || transit == FragmentTransaction.TRANSIT_UNSET){
+            return null
+        }
         var animation: TranslateAnimation? = null
         if (enter && intoAnimation) {
             if (transit == FragmentTransaction.TRANSIT_FRAGMENT_OPEN) {

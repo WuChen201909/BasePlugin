@@ -2,13 +2,13 @@ package com.example.baseplugin.viewmodel
 
 import android.app.Application
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import com.example.baseplugin.http.RetrofitManager
 import com.harrison.plugin.util.constant.HttpResponseCode
-import com.harrison.plugin.mvvm.base.BaseViewModel
-import com.harrison.plugin.mvvm.event.HttpLiveEvent
+import com.harrison.plugin.http.event.HttpLiveEvent
 import com.harrison.plugin.util.io.CoroutineUtils
 
-class MainViewModel(application: Application) : BaseViewModel(application) {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     var httpLiveEvent = HttpLiveEvent<String>()
 

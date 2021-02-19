@@ -13,15 +13,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.harrison.plugin.mvvm.event
+package com.harrison.plugin.mvvm
 
 import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.harrison.plugin.mvvm.base.BaseActivityView
-import com.harrison.plugin.mvvm.base.BaseFragmentView
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**

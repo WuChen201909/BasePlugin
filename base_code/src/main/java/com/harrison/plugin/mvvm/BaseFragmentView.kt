@@ -1,7 +1,6 @@
-package com.harrison.plugin.mvvm.base
+package com.harrison.plugin.mvvm
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,23 +9,20 @@ import android.view.animation.TranslateAnimation
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.harrison.plugin.mvvm.core.MVVMApplication
-import com.harrison.plugin.mvvm.event.SingleLiveEvent
-import com.harrison.plugin.util.developer.LogUtils
 import com.harrison.plugin.util.io.CoroutineUtils
 
 
-open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
+open abstract class BaseFragmentView<T : AndroidViewModel> : Fragment() {
 
     lateinit var viewModel: T
+    abstract fun getViewModelClass(): Class<T>
 
-    lateinit var fragmentContent: FrameLayout
 
+    lateinit var fragmentViewContent: FrameLayout
     var viewCallBack = SingleLiveEvent<View>()
 
-    abstract fun getViewModelClass(): Class<T>
     abstract fun getViewLayout(): Any
     abstract fun viewCreated()  // 视图创建成功
 
@@ -35,9 +31,8 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        fragmentContent = FrameLayout(requireContext())
-
-        return fragmentContent
+        fragmentViewContent = FrameLayout(requireContext())
+        return fragmentViewContent
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -45,8 +40,9 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
 
         viewModel = ViewModelProvider(
             if (isStackModel()) requireActivity() else this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(MVVMApplication.mvvmApplication)
+            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
         ).get(getViewModelClass())
+
 
         var view = getViewLayout()
         if (view is View) {
@@ -56,12 +52,9 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
             viewCallBack.observe(this, {
                 addToContentView(it!!)
 
-                LogUtils.i("加载界面成功02")
                 viewCreated()
             })
-            LogUtils.i("开始加载界面")
             CoroutineUtils.launchLayout(requireContext(), view, {
-                LogUtils.i("加载界面成功01")
                 viewCallBack.value = it
             })
         } else {
@@ -69,10 +62,11 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        fragmentContent.removeAllViews()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        fragmentViewContent.removeAllViews()
     }
+
 
     private fun addToContentView(view: View) {
         var layoutParameter = ViewGroup.LayoutParams(
@@ -80,7 +74,7 @@ open abstract class BaseFragmentView<T : BaseViewModel> : Fragment() {
             ViewGroup.LayoutParams.MATCH_PARENT
         )
         view.layoutParams = layoutParameter
-        fragmentContent.addView(view)
+        fragmentViewContent.addView(view)
     }
 
     /**

@@ -2,7 +2,6 @@ package com.harrison.plugin.util.io
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.harrison.plugin.mvvm.core.MVVMApplication
 import java.util.*
 
 /**
@@ -11,11 +10,9 @@ import java.util.*
  */
 class SPUtils private constructor(spName: String) {
 
-    private val sp: SharedPreferences
+    private lateinit var sp: SharedPreferences
 
-    init {
-        sp = MVVMApplication.mvvmApplication.getSharedPreferences(spName, Context.MODE_PRIVATE)
-    }
+
     /**
      * SP中写入String
      *
@@ -242,26 +239,19 @@ class SPUtils private constructor(spName: String) {
         /**
          * 获取SP实例
          *
-         * @return [SPUtils]
-         */
-        val instance: SPUtils
-            get() = getInstance("")
-
-        /**
-         * 获取SP实例
-         *
          * @param spName sp名
          * @return [SPUtils]
          */
-        fun getInstance(spName: String): SPUtils {
+        fun getInstance(context: Context, spName: String): SPUtils {
             var spName = spName
             if (isSpace(spName)) spName = "spUtils"
-            var sp = sSPMap[spName]
-            if (sp == null) {
-                sp = SPUtils(spName)
-                sSPMap[spName] = sp
+            var spUtil = sSPMap[spName]
+            if (spUtil == null) {
+                spUtil = SPUtils(spName)
+                sSPMap[spName] = spUtil
             }
-            return sp
+            spUtil.sp = context.getSharedPreferences(spName, Context.MODE_PRIVATE)
+            return spUtil
         }
 
         private fun isSpace(s: String?): Boolean {

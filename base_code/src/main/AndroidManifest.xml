@@ -6,7 +6,7 @@
     >
 
     <!-- 网络请求权限  -->
-    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>git git
     <!-- 网络状态读取权限   -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -25,7 +25,7 @@
 
         <activity android:name="com.harrison.plugin.util.developer.crash.DefaultErrorActivity"></activity>
 
-        <!--         异常捕获-->
+        <!--         异常捕获   -->
         <provider
             android:name="com.harrison.plugin.util.developer.crash.CaocInitProvider"
             android:authorities="${applicationId}.customactivityoncrashinitprovider"

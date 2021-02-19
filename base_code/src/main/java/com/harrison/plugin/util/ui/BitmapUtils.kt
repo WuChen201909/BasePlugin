@@ -13,7 +13,6 @@ import android.text.TextUtils
 import android.util.Base64
 import android.util.DisplayMetrics
 import android.view.View
-import com.harrison.plugin.mvvm.core.MVVMApplication
 import java.io.*
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
@@ -704,9 +703,9 @@ object BitmapUtils {
      * @param bitmap bitmap对象
      * @return drawable
      */
-    fun bitmap2Drawable(bitmap: Bitmap?): Drawable? {
+    fun bitmap2Drawable(context: Context,bitmap: Bitmap?): Drawable? {
         return if (bitmap == null) null else BitmapDrawable(
-            MVVMApplication.mvvmApplication.resources,
+            context.resources,
             bitmap
         )
     }
@@ -728,8 +727,8 @@ object BitmapUtils {
      * @param bytes 字节数组
      * @return drawable
      */
-    fun bytes2Drawable(bytes: ByteArray?): Drawable? {
-        return if (bytes == null) null else bitmap2Drawable(bytes2Bitmap(bytes))
+    fun bytes2Drawable(context: Context,bytes: ByteArray?): Drawable? {
+        return if (bytes == null) null else bitmap2Drawable(context,bytes2Bitmap(bytes))
     }
 
     /**

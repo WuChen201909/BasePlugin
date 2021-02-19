@@ -1,8 +1,9 @@
-package com.harrison.plugin.mvvm.event
+package com.harrison.plugin.http.event
 
 import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.LifecycleOwner
+import com.harrison.plugin.mvvm.SingleLiveEvent
 import com.harrison.plugin.util.constant.HttpResponseCode
 
 /**

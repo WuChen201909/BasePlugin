@@ -1,13 +1,10 @@
-package com.harrison.plugin.mvvm.base
+package com.harrison.plugin.mvvm
 
-import android.annotation.TargetApi
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -15,40 +12,32 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
-import com.harrison.plugin.mvvm.core.MVVMApplication
-import com.harrison.plugin.mvvm.event.FragmentTaskEvent
 import com.harrison.plugin.util.developer.LogUtils
 import com.harrison.plugin.util.io.CoroutineUtils
-import java.lang.NullPointerException
-import java.lang.reflect.Field
-import java.lang.reflect.Method
 
 
 /**
  * 尽量保持 Android 原生结构
  *
  * */
-open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
+open abstract class BaseActivityView<T : AndroidViewModel> : AppCompatActivity() {
 
     lateinit var viewModel: T
-
     abstract fun getViewModelClass(): Class<T>
+
     abstract fun getViewLayout(): Any
     abstract fun viewCreated(); // 视图创建成功
 
     var viewCallBack = MutableLiveData<View>()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 配置ViewModel
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(MVVMApplication.mvvmApplication)
-        )
-            .get(getViewModelClass())
+        loadViewModel()
 
         //配置浸入式状态栏
         setTranslucentStatus()
@@ -71,6 +60,14 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
         }
     }
 
+    private fun loadViewModel() {
+        // 配置ViewModel
+        viewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+        )
+            .get(getViewModelClass())
+    }
 
     /**
      * ====================================================
@@ -104,32 +101,34 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
             transaction.commit()
         }
         var intent = Intent()
-        intent.putExtra(ACTION_WHAT,ACTION_TASK_CHANGE)
-        activityResultAction.value =intent
+        intent.putExtra(ACTION_WHAT, ACTION_TASK_CHANGE)
+        activityResultAction.value = intent
     }
 
     /**
      * 将所有栈移除再加入栈
      */
-    fun newNavigator(fragment: Fragment,isAnimation:Boolean = true){
-        this.newNavigator(fragment, null,isAnimation)
+    fun newNavigator(fragment: Fragment, isAnimation: Boolean = true) {
+        this.newNavigator(fragment, null, isAnimation)
     }
-    fun newNavigator(fragment: Fragment, bundle: Bundle?,isAnimation:Boolean = true){
+
+    fun newNavigator(fragment: Fragment, bundle: Bundle?, isAnimation: Boolean = true) {
         var transaction = supportFragmentManager.beginTransaction()
-        for (fItem in fragmentViewStack){
+        for (fItem in fragmentViewStack) {
             transaction.remove(fItem)
         }
         transaction.commit()
-        this.pushNavigator(fragment, bundle,isAnimation)
+        this.pushNavigator(fragment, bundle, isAnimation)
     }
 
     /**
      * 添加到栈
      */
-    fun pushNavigator(fragment: Fragment,isAnimation:Boolean = true) {
-        this.pushNavigator(fragment, null,isAnimation)
+    fun pushNavigator(fragment: Fragment, isAnimation: Boolean = true) {
+        this.pushNavigator(fragment, null, isAnimation)
     }
-    fun pushNavigator(fragment: Fragment, bundle: Bundle?,isAnimation:Boolean = true) {
+
+    fun pushNavigator(fragment: Fragment, bundle: Bundle?, isAnimation: Boolean = true) {
         if (fragmentViewStack.size > 0) {
             var currentFragment = fragmentViewStack.last()
             var transaction = supportFragmentManager.beginTransaction()
@@ -139,7 +138,7 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
         }
 
         bundle?.let { fragment.arguments = it }
-        if(fragment is BaseFragmentView<*>){
+        if (fragment is BaseFragmentView<*>) {
             fragment.outofAnimation = isAnimation
             fragment.intoAnimation = isAnimation
         }
@@ -151,8 +150,8 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
         transaction.commit()
 
         var intent = Intent()
-        intent.putExtra(ACTION_WHAT,ACTION_TASK_CHANGE)
-        activityResultAction.value =intent
+        intent.putExtra(ACTION_WHAT, ACTION_TASK_CHANGE)
+        activityResultAction.value = intent
     }
 
     /**
@@ -227,10 +226,16 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
         }
     }
 
+    /**
+     * 是否点击屏幕其他位置自动隐藏键盘
+     */
     protected open fun isAutoHideKeyBoard(): Boolean {
         return true
     }
 
+    /**
+     * 当开启自动隐藏键盘时，用于过滤点击指定控件不自动隐藏软键盘
+     */
     private fun isShouldHide(v: View?, event: MotionEvent): Boolean {
         //这里是用常用的EditText作判断参照的,可根据情况替换成其它View
         if (v != null &&
@@ -254,7 +259,8 @@ open abstract class BaseActivityView<T : BaseViewModel> : AppCompatActivity() {
      * ===========================================================
      */
 
-    var activityResultAction = FragmentTaskEvent<Intent>()  //只有在栈顶的界面才能收到响应事件
+    //只有在栈顶的界面才能收到响应事件
+    var activityResultAction = FragmentTaskEvent<Intent>()
 
     val ACTION_WHAT = "what"
     val ACTION_TASK_CHANGE = "task_change"

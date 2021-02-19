@@ -19,7 +19,6 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
-import com.harrison.plugin.mvvm.core.MVVMApplication;
 
 
 /**
@@ -32,7 +31,7 @@ public final class ToastUtils {
     private static Toast sToast;
     private static int gravity         = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
     private static int xOffset         = 0;
-    private static int yOffset         = (int) (64 * MVVMApplication.mvvmApplication.getResources().getDisplayMetrics().density + 0.5);
+    private static int yOffset         = 0;
     private static int backgroundColor = DEFAULT_COLOR;
     private static int bgResource      = -1;
     private static int messageColor    = DEFAULT_COLOR;
@@ -61,8 +60,8 @@ public final class ToastUtils {
      *
      * @param layoutId 视图
      */
-    public static void setView(@LayoutRes int layoutId) {
-        LayoutInflater inflate = (LayoutInflater) MVVMApplication.mvvmApplication.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    public static void setView(Context context,@LayoutRes int layoutId) {
+        LayoutInflater inflate = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         sViewWeakReference = new WeakReference<>(inflate.inflate(layoutId, null));
     }
 
@@ -123,11 +122,11 @@ public final class ToastUtils {
      *
      * @param text 文本
      */
-    public static void showShortSafe(final CharSequence text) {
+    public static void showShortSafe(Context context,final CharSequence text) {
         sHandler.post(new Runnable() {
             @Override
             public void run() {
-                show(text, Toast.LENGTH_SHORT);
+                show(context,text, Toast.LENGTH_SHORT);
             }
         });
     }
@@ -137,11 +136,11 @@ public final class ToastUtils {
      *
      * @param resId 资源Id
      */
-    public static void showShortSafe(final @StringRes int resId) {
+    public static void showShortSafe(Context context,final @StringRes int resId) {
         sHandler.post(new Runnable() {
             @Override
             public void run() {
-                show(resId, Toast.LENGTH_SHORT);
+                show(context,resId, Toast.LENGTH_SHORT);
             }
         });
     }
@@ -152,11 +151,11 @@ public final class ToastUtils {
      * @param resId 资源Id
      * @param args  参数
      */
-    public static void showShortSafe(final @StringRes int resId, final Object... args) {
+    public static void showShortSafe(Context context,final @StringRes int resId, final Object... args) {
         sHandler.post(new Runnable() {
             @Override
             public void run() {
-                show(resId, Toast.LENGTH_SHORT, args);
+                show(context,resId, Toast.LENGTH_SHORT, args);
             }
         });
     }
@@ -181,11 +180,11 @@ public final class ToastUtils {
      *
      * @param text 文本
      */
-    public static void showLongSafe(final CharSequence text) {
+    public static void showLongSafe(Context context,final CharSequence text) {
         sHandler.post(new Runnable() {
             @Override
             public void run() {
-                show(text, Toast.LENGTH_LONG);
+                show(context,text, Toast.LENGTH_LONG);
             }
         });
     }
@@ -195,11 +194,11 @@ public final class ToastUtils {
      *
      * @param resId 资源Id
      */
-    public static void showLongSafe(final @StringRes int resId) {
+    public static void showLongSafe(Context context,final @StringRes int resId) {
         sHandler.post(new Runnable() {
             @Override
             public void run() {
-                show(resId, Toast.LENGTH_LONG);
+                show(context,resId, Toast.LENGTH_LONG);
             }
         });
     }
@@ -210,11 +209,11 @@ public final class ToastUtils {
      * @param resId 资源Id
      * @param args  参数
      */
-    public static void showLongSafe(final @StringRes int resId, final Object... args) {
+    public static void showLongSafe(Context context,final @StringRes int resId, final Object... args) {
         sHandler.post(new Runnable() {
             @Override
             public void run() {
-                show(resId, Toast.LENGTH_LONG, args);
+                show(context,resId, Toast.LENGTH_LONG, args);
             }
         });
     }
@@ -239,8 +238,8 @@ public final class ToastUtils {
      *
      * @param text 文本
      */
-    public static void showShort(CharSequence text) {
-        show(text, Toast.LENGTH_SHORT);
+    public static void showShort(Context context,CharSequence text) {
+        show(context,text, Toast.LENGTH_SHORT);
     }
 
     /**
@@ -248,8 +247,8 @@ public final class ToastUtils {
      *
      * @param resId 资源Id
      */
-    public static void showShort(@StringRes int resId) {
-        show(resId, Toast.LENGTH_SHORT);
+    public static void showShort(Context context,@StringRes int resId) {
+        show(context,resId, Toast.LENGTH_SHORT);
     }
 
     /**
@@ -258,8 +257,8 @@ public final class ToastUtils {
      * @param resId 资源Id
      * @param args  参数
      */
-    public static void showShort(@StringRes int resId, Object... args) {
-        show(resId, Toast.LENGTH_SHORT, args);
+    public static void showShort(Context context,@StringRes int resId, Object... args) {
+        show(context,resId, Toast.LENGTH_SHORT, args);
     }
 
     /**
@@ -277,8 +276,8 @@ public final class ToastUtils {
      *
      * @param text 文本
      */
-    public static void showLong(CharSequence text) {
-        show(text, Toast.LENGTH_LONG);
+    public static void showLong(Context context,CharSequence text) {
+        show(context,text, Toast.LENGTH_LONG);
     }
 
     /**
@@ -286,8 +285,8 @@ public final class ToastUtils {
      *
      * @param resId 资源Id
      */
-    public static void showLong(@StringRes int resId) {
-        show(resId, Toast.LENGTH_LONG);
+    public static void showLong(Context context,@StringRes int resId) {
+        show(context,resId, Toast.LENGTH_LONG);
     }
 
     /**
@@ -296,8 +295,8 @@ public final class ToastUtils {
      * @param resId 资源Id
      * @param args  参数
      */
-    public static void showLong(@StringRes int resId, Object... args) {
-        show(resId, Toast.LENGTH_LONG, args);
+    public static void showLong(Context context, @StringRes int resId, Object... args) {
+        show(context,resId, Toast.LENGTH_LONG, args);
     }
 
     /**
@@ -354,8 +353,8 @@ public final class ToastUtils {
      * @param resId    资源Id
      * @param duration 显示时长
      */
-    private static void show(@StringRes int resId, int duration) {
-        show(MVVMApplication.mvvmApplication.getResources().getText(resId).toString(), duration);
+    private static void show(Context context,@StringRes int resId, int duration) {
+        show(context.getResources().getText(resId).toString(), duration);
     }
 
     /**
@@ -365,8 +364,8 @@ public final class ToastUtils {
      * @param duration 显示时长
      * @param args     参数
      */
-    private static void show(@StringRes int resId, int duration, Object... args) {
-        show(String.format(MVVMApplication.mvvmApplication.getResources().getString(resId), args), duration);
+    private static void show(Context context,@StringRes int resId, int duration, Object... args) {
+        show(String.format(context.getResources().getString(resId), args), duration);
     }
 
     /**
@@ -386,13 +385,13 @@ public final class ToastUtils {
      * @param text     文本
      * @param duration 显示时长
      */
-    private static void show(CharSequence text, int duration) {
+    private static void show(Context context,CharSequence text, int duration) {
         cancel();
         boolean isCustom = false;
         if (sViewWeakReference != null) {
             final View view = sViewWeakReference.get();
             if (view != null) {
-                sToast = new Toast(MVVMApplication.mvvmApplication);
+                sToast = new Toast(context);
                 sToast.setView(view);
                 sToast.setDuration(duration);
                 isCustom = true;
@@ -403,9 +402,9 @@ public final class ToastUtils {
                 SpannableString spannableString = new SpannableString(text);
                 ForegroundColorSpan colorSpan = new ForegroundColorSpan(messageColor);
                 spannableString.setSpan(colorSpan, 0, spannableString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                sToast = Toast.makeText(MVVMApplication.mvvmApplication, spannableString, duration);
+                sToast = Toast.makeText(context, spannableString, duration);
             } else {
-                sToast = Toast.makeText(MVVMApplication.mvvmApplication, text, duration);
+                sToast = Toast.makeText(context, text, duration);
             }
         }
         View view = sToast.getView();
@@ -414,6 +413,7 @@ public final class ToastUtils {
         } else if (backgroundColor != DEFAULT_COLOR) {
             view.setBackgroundColor(backgroundColor);
         }
+        yOffset         = (int) (64 * context.getResources().getDisplayMetrics().density + 0.5);
         sToast.setGravity(gravity, xOffset, yOffset);
         sToast.show();
     }

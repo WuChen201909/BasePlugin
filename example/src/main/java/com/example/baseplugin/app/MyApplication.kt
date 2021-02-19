@@ -1,10 +1,10 @@
 package com.example.baseplugin.app
 
-import com.harrison.plugin.mvvm.core.MVVMApplication
+import android.app.Application
 import com.harrison.plugin.util.developer.LogUtils
 import com.kok.kuailong.utils.Performance
 
-class MyApplication : MVVMApplication() {
+class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()

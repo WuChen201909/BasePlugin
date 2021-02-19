@@ -16,7 +16,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.example.baseplugin.R
 import com.example.baseplugin.viewmodel.MainViewModel
-import com.harrison.plugin.mvvm.base.BaseActivityView
+import com.harrison.plugin.mvvm.BaseActivityView
 import com.harrison.plugin.util.developer.LogUtils
 import com.harrison.plugin.util.hardware.Memory
 import com.kok.kuailong.utils.Performance

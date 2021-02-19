@@ -1,12 +1,12 @@
 package com.example.baseplugin.view
 
+import androidx.lifecycle.AndroidViewModel
 import com.example.baseplugin.R
-import com.harrison.plugin.mvvm.base.BaseActivityView
-import com.harrison.plugin.mvvm.base.BaseViewModel
+import com.harrison.plugin.mvvm.BaseActivityView
 
-class SecondActivity: BaseActivityView<BaseViewModel>() {
-    override fun getViewModelClass(): Class<BaseViewModel> {
-        return BaseViewModel::class.java
+class SecondActivity: BaseActivityView<AndroidViewModel>() {
+    override fun getViewModelClass(): Class<AndroidViewModel> {
+        return AndroidViewModel::class.java
     }
 
 

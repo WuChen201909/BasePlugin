@@ -21,12 +21,18 @@ import com.harrison.plugin.util.io.CoroutineUtils
 
 /**
  * 尽量保持 Android 原生结构
+ * 封装功能
+ *      1、浸入式状态栏
+ *      2、点击指定空白处自动关闭软键盘
  *
+ * 性能优化
+ *      1、异步加载视图
+ *      2、单Activity 多 Fragment 堆栈管理
+ *      3、除了生命周期其他回掉都换为事件机制
  * */
-open abstract class BaseActivityView<T : AndroidViewModel> : AppCompatActivity() {
+open abstract class BaseActivityView: AppCompatActivity() {
 
-    lateinit var viewModel: T
-    abstract fun getViewModelClass(): Class<T>
+
 
     abstract fun getViewLayout(): Any
     abstract fun viewCreated(); // 视图创建成功
@@ -36,8 +42,6 @@ open abstract class BaseActivityView<T : AndroidViewModel> : AppCompatActivity()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        loadViewModel()
 
         //配置浸入式状态栏
         setTranslucentStatus()
@@ -60,49 +64,20 @@ open abstract class BaseActivityView<T : AndroidViewModel> : AppCompatActivity()
         }
     }
 
-    private fun loadViewModel() {
-        // 配置ViewModel
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-        )
-            .get(getViewModelClass())
-    }
-
     /**
      * ====================================================
      * Fragment 堆栈管理
      * ====================================================
      */
 
+    // 视图堆栈中心储存
     var fragmentViewStack: MutableList<Fragment> = arrayListOf();
 
     /**
-     * 回退栈
+     * 当前视图回到栈顶
      */
-    fun popNavigator() {
-        if (fragmentViewStack.size <= 0) {
-            return
-        }
+    open fun onBackToTaskTop(){
 
-        var currentFragment = fragmentViewStack.last()
-        fragmentViewStack.remove(currentFragment)
-
-        var transaction = supportFragmentManager.beginTransaction()
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)  //表示使用打开的动画 并不表示打开页面
-        transaction.remove(currentFragment)
-        transaction.commit()
-
-        if (fragmentViewStack.size > 0) {
-            var currentFragment = fragmentViewStack.last()
-            transaction = supportFragmentManager.beginTransaction()
-            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)  // 表示使用关闭的动画  并不表示关闭页面
-            transaction.show(currentFragment)
-            transaction.commit()
-        }
-        var intent = Intent()
-        intent.putExtra(ACTION_WHAT, ACTION_TASK_CHANGE)
-        activityResultAction.value = intent
     }
 
     /**
@@ -138,7 +113,7 @@ open abstract class BaseActivityView<T : AndroidViewModel> : AppCompatActivity()
         }
 
         bundle?.let { fragment.arguments = it }
-        if (fragment is BaseFragmentView<*>) {
+        if (fragment is BaseFragmentView) {
             fragment.outofAnimation = isAnimation
             fragment.intoAnimation = isAnimation
         }
@@ -166,6 +141,40 @@ open abstract class BaseActivityView<T : AndroidViewModel> : AppCompatActivity()
         }
         return super.onKeyDown(keyCode, event)
     }
+
+    /**
+     * 回退栈
+     */
+    fun popNavigator() {
+        if (fragmentViewStack.size <= 0) {
+            return
+        }
+
+        var currentFragment = fragmentViewStack.last()
+        fragmentViewStack.remove(currentFragment)
+
+        var transaction = supportFragmentManager.beginTransaction()
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)  //表示使用打开的动画 并不表示打开页面
+        transaction.remove(currentFragment)
+        transaction.commit()
+
+        if (fragmentViewStack.size > 0) {
+            var currentFragment = fragmentViewStack.last()
+            transaction = supportFragmentManager.beginTransaction()
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)  // 表示使用关闭的动画  并不表示关闭页面
+            transaction.show(currentFragment)
+            transaction.commit()
+
+            if(currentFragment is BaseFragmentView)
+                currentFragment.onBackToTaskTop()
+        }else{
+            onBackToTaskTop()
+        }
+        var intent = Intent()
+        intent.putExtra(ACTION_WHAT, ACTION_TASK_CHANGE)
+        activityResultAction.value = intent
+    }
+
 
     /**
      * ====================================================
@@ -258,16 +267,17 @@ open abstract class BaseActivityView<T : AndroidViewModel> : AppCompatActivity()
      * 事件管理 ， 处理非UI生命周期事件
      * ===========================================================
      */
-
     //只有在栈顶的界面才能收到响应事件
     var activityResultAction = FragmentTaskEvent<Intent>()
 
-    val ACTION_WHAT = "what"
-    val ACTION_TASK_CHANGE = "task_change"
+    val ACTION_WHAT = "what" //设置到响应Intent中的类型 ，使用 intent.putExtra(ACTION_WHAT,XXXX)
+    val ACTION_TASK_CHANGE = "task_change"  //堆栈发生变化
+    val ACTION_ACTIVITY_RESULT = "onActivityResult"
+    val ACTION_PERMISSION_RESULT = "onRequestPermissionsResult"
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        responseRequestAction(requestCode, resultCode, data)
+        responseRequestAction(requestCode, resultCode, data,ACTION_ACTIVITY_RESULT)
     }
 
     override fun onRequestPermissionsResult(
@@ -281,12 +291,12 @@ open abstract class BaseActivityView<T : AndroidViewModel> : AppCompatActivity()
         bundle.putStringArray("permissions", permissions)
         bundle.putIntArray("grantResults", grantResults)
         data.putExtras(bundle)
-        responseRequestAction(requestCode, 0, data)
+        responseRequestAction(requestCode, 0, data,ACTION_PERMISSION_RESULT)
     }
 
     private fun responseRequestAction(
         requestCode: Int, resultCode: Int,
-        data: Intent?
+        data: Intent?,what:String
     ) {
         var result: Intent =
             if (data == null) {
@@ -294,16 +304,17 @@ open abstract class BaseActivityView<T : AndroidViewModel> : AppCompatActivity()
             } else {
                 data
             }
-        var bundle: Bundle = if (intent.extras == null) {
+        var bundle: Bundle = if (data?.extras == null) {
             Bundle()
         } else {
-            intent.extras!!
+            data.extras!!
         }
 
         bundle.putInt("requestCode", requestCode)
         bundle.putInt("resultCode", resultCode)
 
         result.putExtras(bundle)
+        result.putExtra(ACTION_WHAT,what)
 
         activityResultAction.value = result
     }

@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -51,11 +52,49 @@ class PhotoUtils(context: Context) {
         )
 
         imageResultPath = Uri.fromFile(File(context.filesDir.path.toString() + File.separator + imageResultName))
+    }
 
+
+
+    /**
+     *  设置获取到照片的回掉
+     *      @param callBack 当获取到照片后会回掉当前函数
+     */
+    fun setCalBack(callBack: (path: Uri, base64: String?) -> Unit){
+        this.callBack = callBack
     }
 
     /**
-     * 在ActivityResult回掉中调用该函数
+     *  请求权限和请求照片返回时回掉调用
+     */
+    fun responseRequestAction(activity: Activity,
+        requestCode: Int, resultCode: Int,
+        data: Intent?
+    ) {
+        var result: Intent =
+            if (data == null) {
+                Intent()
+            } else {
+                data
+            }
+        var bundle: Bundle = if (data?.extras == null) {
+            Bundle()
+        } else {
+            data.extras!!
+        }
+
+        bundle.putInt("requestCode", requestCode)
+        bundle.putInt("resultCode", resultCode)
+
+        result.putExtras(bundle)
+
+        onActivityResult(activity,result)
+    }
+
+    /**
+     * 自定义封装中使用封装的响应事件回掉
+     *      在非自定义封装的函数中使用responseRequestAction函数进行回掉
+     *      在ActivityResult 和 onRequestPermissionsResult 回掉传入到当前事件中
      */
     fun onActivityResult(activity: Activity, intent: Intent){
 
@@ -126,13 +165,6 @@ class PhotoUtils(context: Context) {
             cameraSavePath
         ) //将拍取的照片保存到指定URI
         activity.startActivityForResult(intent, SELECT_FROM_CAMERA)
-    }
-
-    /**
-     *  设置回掉
-     */
-    fun setCalBack(callBack: (path: Uri, base64: String?) -> Unit){
-        this.callBack = callBack
     }
 
 }

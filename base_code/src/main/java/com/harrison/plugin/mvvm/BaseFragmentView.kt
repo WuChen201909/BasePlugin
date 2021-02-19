@@ -14,17 +14,14 @@ import androidx.lifecycle.ViewModelProvider
 import com.harrison.plugin.util.io.CoroutineUtils
 
 
-open abstract class BaseFragmentView<T : AndroidViewModel> : Fragment() {
-
-    lateinit var viewModel: T
-    abstract fun getViewModelClass(): Class<T>
+open abstract class BaseFragmentView : Fragment() {
 
 
     lateinit var fragmentViewContent: FrameLayout
     var viewCallBack = SingleLiveEvent<View>()
 
     abstract fun getViewLayout(): Any
-    abstract fun viewCreated()  // 视图创建成功
+    abstract fun viewCreated()  //视图创建成功
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,11 +34,6 @@ open abstract class BaseFragmentView<T : AndroidViewModel> : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        viewModel = ViewModelProvider(
-            if (isStackModel()) requireActivity() else this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        ).get(getViewModelClass())
 
 
         var view = getViewLayout()
@@ -67,7 +59,6 @@ open abstract class BaseFragmentView<T : AndroidViewModel> : Fragment() {
         fragmentViewContent.removeAllViews()
     }
 
-
     private fun addToContentView(view: View) {
         var layoutParameter = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -84,19 +75,22 @@ open abstract class BaseFragmentView<T : AndroidViewModel> : Fragment() {
      */
 
     /**
-     * 堆栈管理模式
+     * 当前视图回到栈顶
      */
-    open fun isStackModel(): Boolean {
-        return false
+    open fun onBackToTaskTop(){
+
     }
 
+    /**
+     * 加入到Fragment栈中
+     */
     fun pushNavigator(fragment: Fragment,isAnimation:Boolean = true) {
         this.pushNavigator(fragment, null,isAnimation)
     }
 
     fun pushNavigator(fragment: Fragment, bundle: Bundle?,isAnimation:Boolean = true) {
-        if (isStackModel() && requireActivity() is BaseActivityView<*>) {
-            (requireActivity() as BaseActivityView<*>).pushNavigator(fragment, bundle,isAnimation)
+        if ( requireActivity() is BaseActivityView) {
+            (requireActivity() as BaseActivityView).pushNavigator(fragment, bundle,isAnimation)
         }
     }
 
@@ -107,8 +101,8 @@ open abstract class BaseFragmentView<T : AndroidViewModel> : Fragment() {
         this.newNavigator(fragment, null,isAnimation)
     }
     fun newNavigator(fragment: Fragment, bundle: Bundle?,isAnimation:Boolean = true){
-        if (isStackModel() && requireActivity() is BaseActivityView<*>) {
-            (requireActivity() as BaseActivityView<*>).newNavigator(fragment, bundle,isAnimation)
+        if (requireActivity() is BaseActivityView) {
+            (requireActivity() as BaseActivityView).newNavigator(fragment, bundle,isAnimation)
         }
     }
 
@@ -116,16 +110,16 @@ open abstract class BaseFragmentView<T : AndroidViewModel> : Fragment() {
      * 将自己退出显示栈
      */
     fun popNavigator() {
-        if (isStackModel() && requireActivity() is BaseActivityView<*>) {
-            (requireActivity() as BaseActivityView<*>).popNavigator()
+        if (requireActivity() is BaseActivityView) {
+            (requireActivity() as BaseActivityView).popNavigator()
         }
     }
 
     /**
      * 获取根Activity
      */
-    fun superBaseActivity(): BaseActivityView<*> {
-        return requireActivity() as BaseActivityView<*>
+    fun superBaseActivity(): BaseActivityView {
+        return requireActivity() as BaseActivityView
     }
 
     /**

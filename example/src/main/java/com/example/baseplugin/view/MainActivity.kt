@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import com.example.baseplugin.R
 import com.example.baseplugin.viewmodel.MainViewModel
 import com.harrison.plugin.mvvm.BaseActivityView
@@ -24,9 +25,17 @@ import com.tbruyelle.rxpermissions3.RxPermissions
 import kotlinx.android.synthetic.main.activity_main.*
 
 
-class MainActivity : BaseActivityView<MainViewModel>() {
+class MainActivity : BaseActivityView() {
+
+    lateinit var viewModel: MainViewModel
+
+    override fun getViewLayout(): Any {
+        viewModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(application)).get(MainViewModel::class.java)
+        return R.layout.activity_main
+    }
 
     override fun viewCreated() {
+
         Performance.startCountTime("1")
         LogUtils.e("result", "count time:" + Performance.endCountTime("1"))
 
@@ -154,13 +163,5 @@ class MainActivity : BaseActivityView<MainViewModel>() {
         startActivityForResult(intent, 0)
     }
 
-    override fun getViewModelClass(): Class<MainViewModel> {
-        return MainViewModel::class.java
-    }
-
-    override fun getViewLayout(): Any {
-
-        return R.layout.activity_main
-    }
 
 }

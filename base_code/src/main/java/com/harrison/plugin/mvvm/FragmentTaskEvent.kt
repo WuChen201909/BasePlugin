@@ -21,15 +21,15 @@ class FragmentTaskEvent<T>:MutableLiveData<T>() {
      * 判断是否在栈顶
      */
     fun isFrontTask(owner: LifecycleOwner):Boolean{
-        var baseActivity: BaseActivityView<*>? = null
-        if(owner is BaseActivityView<*>){
+        var baseActivity: BaseActivityView? = null
+        if(owner is BaseActivityView){
             baseActivity = owner
         }
-        if(owner is BaseFragmentView<*>){
-            baseActivity = owner.requireActivity() as BaseActivityView<*>
+        if(owner is BaseFragmentView){
+            baseActivity = owner.requireActivity() as BaseActivityView
         }
         if(baseActivity != null){
-            if(owner is BaseActivityView<*> && baseActivity.fragmentViewStack.size == 0){
+            if(owner is BaseActivityView && baseActivity.fragmentViewStack.size == 0){
                 return true
             }else if(baseActivity.fragmentViewStack.last() == owner){
                 return true

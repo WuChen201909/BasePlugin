@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.harrison.plugin.widget.SafeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -8,7 +8,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="这是第二个页面">
-
     </Button>
 
-</LinearLayout>
+    <com.harrison.plugin.widget.CompatRecyclerView
+        android:id="@+id/crv_test"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </com.harrison.plugin.widget.CompatRecyclerView>
+
+
+</com.harrison.plugin.widget.SafeLayout>

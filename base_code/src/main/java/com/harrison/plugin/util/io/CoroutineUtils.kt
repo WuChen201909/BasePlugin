@@ -1,7 +1,6 @@
 package com.harrison.plugin.util.io
 
 import android.content.Context
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import com.harrison.plugin.util.developer.LogUtils
@@ -9,7 +8,6 @@ import kotlinx.coroutines.*
 import org.json.JSONException
 import java.io.IOException
 import java.lang.Exception
-import kotlin.coroutines.CoroutineContext
 
 
 /**
@@ -70,7 +68,15 @@ object CoroutineUtils {
         callResult: (result: T) -> Unit,
         callError: (code: Int, error: String) -> Unit
     ) {
-        CoroutineUtils.launchIO {
+        var httpExceptionHandler = CoroutineExceptionHandler { _ , throwable ->
+            LogUtils.printException(throwable)
+            CoroutineUtils.launchMain {
+                callError(-200, "${throwable.message}")
+            }
+        }
+
+        var httpScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + httpExceptionHandler)
+        httpScope.launch {
             try {
                 var re = async()
                 CoroutineUtils.launchMain {

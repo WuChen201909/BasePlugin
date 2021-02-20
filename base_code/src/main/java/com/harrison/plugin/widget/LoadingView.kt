@@ -27,6 +27,8 @@ class LoadingView : LinearLayout, View.OnClickListener {
     private var ll_kong: View? = null
     private var mListener: OnRefreshListener? = null
 
+    var status:Int = 0
+
     companion object {
         const val LOADING = 0 //加载中
         const val STOP_LOADING = 1 //停止加载
@@ -38,11 +40,14 @@ class LoadingView : LinearLayout, View.OnClickListener {
         // 把加载视图注入到布局中
         fun fillInLayout(layout: ViewGroup): LoadingView {
             // 获取指定控件的父控件
-            var parent :ViewGroup = layout.parent as ViewGroup
+            var parent: ViewGroup = layout.parent as ViewGroup
             parent.removeView(layout) //将控件本身移除
             //添加一个容器控件 为了方便加载视图压在内容上方
             var contentView = FrameLayout(layout.context)
-            var contentLayoutParam = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT)
+            var contentLayoutParam = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
             contentView.layoutParams = contentLayoutParam
             //添加回内容到容器
             contentView.addView(layout)
@@ -88,7 +93,7 @@ class LoadingView : LinearLayout, View.OnClickListener {
     private fun init(context: Context) {
         val inflater = context
             .getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        var  mView = inflater.inflate(R.layout.loading_layout, this)
+        var mView = inflater.inflate(R.layout.loading_layout, this)
         mView.setBackgroundColor(Color.parseColor("#22FFFFFF"))
         imageView = mView.findViewById<View>(R.id.iv_loading) as ImageView
         mLlLoading = mView.findViewById<View>(R.id.ll_loading) as LinearLayout
@@ -104,33 +109,34 @@ class LoadingView : LinearLayout, View.OnClickListener {
 
     fun setStatue(status: Int) {
         visibility = VISIBLE
-        try {
-            if (status == LOADING) { //更新
-                mRlError!!.visibility = View.GONE
-                mLlLoading!!.visibility = VISIBLE
-                ll_kong!!.visibility = View.GONE
-                mAni!!.start()
-            } else if (status == STOP_LOADING) {
-                mAni!!.stop()
-                visibility = View.GONE
-                ll_kong!!.visibility = View.GONE
-            } else if (status == NO_DATA) { //无数据情况
-                mAni!!.stop()
-                mRlError!!.visibility = View.GONE
-                mLlLoading!!.visibility = View.GONE
-                ll_kong!!.visibility = VISIBLE
-            } else if (status == NO_NETWORK) { //无网络情况
-                mAni!!.stop()
-                mRlError!!.visibility = VISIBLE
-                mLlLoading!!.visibility = View.GONE
-                ll_kong!!.visibility = View.GONE
-            } else {
-                mAni!!.stop()
-                visibility = View.GONE
-                ll_kong!!.visibility = View.GONE
-            }
-        } catch (e: OutOfMemoryError) {
+
+        if (status == LOADING) { //更新
+            mRlError!!.visibility = View.GONE
+            mLlLoading!!.visibility = VISIBLE
+            ll_kong!!.visibility = View.GONE
+            mAni!!.start()
+        } else if (status == STOP_LOADING) {
+            mAni!!.stop()
+            visibility = View.GONE
+            ll_kong!!.visibility = View.GONE
+        } else if (status == NO_DATA) { //无数据情况
+            mAni!!.stop()
+            mRlError!!.visibility = View.GONE
+            mLlLoading!!.visibility = View.GONE
+            ll_kong!!.visibility = VISIBLE
+        } else if (status == NO_NETWORK) { //无网络情况
+            mAni!!.stop()
+            mRlError!!.visibility = VISIBLE
+            mLlLoading!!.visibility = View.GONE
+            ll_kong!!.visibility = View.GONE
+        } else {
+            mAni!!.stop()
+            visibility = View.GONE
+            ll_kong!!.visibility = View.GONE
         }
+
+        this.status = status
+
     }
 
     override fun onClick(v: View) {

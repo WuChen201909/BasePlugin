@@ -19,7 +19,6 @@ abstract class CompatRecyclerAdapter<T : RecyclerView.ViewHolder?, D> : Recycler
      *  封装点击事件
      * =============================
      */
-
     override fun getItemCount(): Int {
 
         return mData.size

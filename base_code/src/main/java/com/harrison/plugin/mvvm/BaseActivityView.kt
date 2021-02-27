@@ -32,13 +32,10 @@ import com.harrison.plugin.util.io.CoroutineUtils
  * */
 open abstract class BaseActivityView: AppCompatActivity() {
 
-
-
     abstract fun getViewLayout(): Any
     abstract fun viewCreated(); // 视图创建成功
 
     var viewCallBack = MutableLiveData<View>()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

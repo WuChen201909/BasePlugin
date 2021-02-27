@@ -9,13 +9,12 @@
         android:layout_height="wrap_content"
         android:text="这是第二个页面">
     </Button>
-
-    <com.harrison.plugin.widget.CompatRecyclerView
-        android:id="@+id/crv_test"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerview_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </com.harrison.plugin.widget.CompatRecyclerView>
+    </androidx.recyclerview.widget.RecyclerView>
 
 
 </com.harrison.plugin.widget.SafeLayout>

@@ -20,7 +20,7 @@ import com.harrison.plugin.util.io.CoroutineUtils
 
 
 /**
- * 尽量保持 Android 原生结构
+ * 尽量保持 Android 原生结构，不用范型的方式封装ViewMode的初始化
  * 封装功能
  *      1、浸入式状态栏
  *      2、点击指定空白处自动关闭软键盘
@@ -33,8 +33,15 @@ import com.harrison.plugin.util.io.CoroutineUtils
 open abstract class BaseActivityView: AppCompatActivity() {
 
     abstract fun getViewLayout(): Any
-    abstract fun viewCreated(); // 视图创建成功
 
+    /**
+     * 异步加载视图结束回掉
+     */
+    abstract fun viewCreated();
+
+    /**
+     * 使用LiveData避免异步异步加载视图在界面关闭时填充到界面
+     */
     var viewCallBack = MutableLiveData<View>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,9 +52,11 @@ open abstract class BaseActivityView: AppCompatActivity() {
 
         //加载显示视图
         var view = getViewLayout()
+        //当视图已经加载完成直接显示
         if (view is View) {
             setContentView(view)
             viewCreated()
+        //XML 视图使用异步加载视图
         } else if (view is Int) {
             viewCallBack.observe(this, {
                 setContentView(it)
@@ -71,7 +80,7 @@ open abstract class BaseActivityView: AppCompatActivity() {
     var fragmentViewStack: MutableList<Fragment> = arrayListOf();
 
     /**
-     * 当前视图回到栈顶
+     * 当前视图返回到栈顶的回掉事件
      */
     open fun onBackToTaskTop(){
 
@@ -79,6 +88,8 @@ open abstract class BaseActivityView: AppCompatActivity() {
 
     /**
      * 将所有栈移除再加入栈
+     * @param fragment 加入堆栈的页面
+     * @param isAnimation 是否使用动画
      */
     fun newNavigator(fragment: Fragment, isAnimation: Boolean = true) {
         this.newNavigator(fragment, null, isAnimation)
@@ -164,9 +175,10 @@ open abstract class BaseActivityView: AppCompatActivity() {
 
             if(currentFragment is BaseFragmentView)
                 currentFragment.onBackToTaskTop()
-        }else{
-            onBackToTaskTop()
         }
+//        else{
+//            onBackToTaskTop()
+//        }
         var intent = Intent()
         intent.putExtra(ACTION_WHAT, ACTION_TASK_CHANGE)
         activityResultAction.value = intent
@@ -190,7 +202,7 @@ open abstract class BaseActivityView: AppCompatActivity() {
             LogUtils.i("设置SDK大于19的状态栏")
             //绘制状态栏背景色
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            window.statusBarColor = Color.TRANSPARENT  //设置状态栏颜色为透明
+            window.statusBarColor = Color.TRANSPARENT //设置状态栏颜色为透明
 
             var decorView = window.decorView
             decorView.systemUiVisibility =

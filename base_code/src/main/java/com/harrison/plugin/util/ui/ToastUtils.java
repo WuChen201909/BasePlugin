@@ -1,4 +1,4 @@
-package com.harrison.plugin.util.component;
+package com.harrison.plugin.util.ui;
 
 import android.content.Context;
 import android.os.Handler;

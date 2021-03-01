@@ -13,9 +13,15 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.harrison.plugin.util.io.CoroutineUtils
 
-
+/**
+ *
+ *
+ * 主要封装实现功能
+ *  1、异步视图加载
+ *  2、配合BaseActivityView完成单Activity多Fragment的堆栈管理
+ *  3、封装界面切入与退出动画
+ */
 open abstract class BaseFragmentView : Fragment() {
-
 
     lateinit var fragmentViewContent: FrameLayout
     var viewCallBack = SingleLiveEvent<View>()
@@ -37,9 +43,11 @@ open abstract class BaseFragmentView : Fragment() {
 
 
         var view = getViewLayout()
+        //当视图已经加载完成直接显示
         if (view is View) {
             addToContentView(view)
             viewCreated()
+        //XML 视图使用异步加载视图
         } else if (view is Int) {
             viewCallBack.observe(this, {
                 addToContentView(it!!)
@@ -70,12 +78,12 @@ open abstract class BaseFragmentView : Fragment() {
 
     /**
      * ====================================================
-     * Fragment 堆栈管理
+     *  Fragment 堆栈管理
      * ====================================================
      */
 
     /**
-     * 当前视图回到栈顶
+     *  当前视图返回到栈顶的回掉事件
      */
     open fun onBackToTaskTop(){
 

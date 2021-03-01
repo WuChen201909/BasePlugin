@@ -10,10 +10,8 @@ import com.harrison.plugin.util.developer.LogUtils
 
 /**
  * 安全区布局  自动添加状态栏填充
- *
  */
 class SafeLayout(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {
-
 
     var titleView: View
 
@@ -29,8 +27,6 @@ class SafeLayout(context: Context, attrs: AttributeSet?) : LinearLayout(context,
         var layoutParams = ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, titleHeight)
         titleView.layoutParams = layoutParams
         addView(titleView)
-
     }
-
 
 }

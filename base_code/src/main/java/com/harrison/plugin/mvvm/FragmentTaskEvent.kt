@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 
 /**
- * 只有在栈顶的页面才能响应事件
+ * 配合BaseActivityView和BaseFragmentView完成栈顶事件响应，只有栈顶的页面才会响应事件
  */
 class FragmentTaskEvent<T>:MutableLiveData<T>() {
 

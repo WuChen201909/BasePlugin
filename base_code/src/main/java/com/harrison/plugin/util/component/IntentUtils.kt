@@ -9,7 +9,7 @@ import android.util.Log
 object IntentUtils {
 
     /**
-     *  通过类名跳转到指定类
+     *  通过类名跳转到指定类的Activity
      */
     fun intentToActivityByClassName(context:Context,packageName:String,activityName:String){
         var intent = Intent()

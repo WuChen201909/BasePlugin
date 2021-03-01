@@ -18,9 +18,7 @@ import androidx.fragment.app.FragmentManager
 
 /**
  * 自定义对话框 , 仿IOS风格
- *  1、标题
- *  2、内容
- *  3、按钮
+ *      默认结构由以下几个部分组成：1、标题 2、内容  3、按钮（最多三个）
  */
 class CustomAlertDialog : DialogFragment() {
 

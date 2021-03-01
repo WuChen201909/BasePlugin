@@ -23,7 +23,7 @@ import okio.Buffer;
 import okio.BufferedSource;
 
 /**
- * 日志
+ * 日志拦截
  */
 public class LogInterceptor implements Interceptor {
     private final Charset UTF8 = Charset.forName("UTF-8");
@@ -50,7 +50,7 @@ public class LogInterceptor implements Interceptor {
             body = buffer.readString(charset);
         }
 
-        Log.e(TAG, "║ " + "     url:" + request.url());
+        Log.e(TAG, "║ StartRequest:" + request.url());
 
         long startNs = System.nanoTime();
         Response response = chain.proceed(request);

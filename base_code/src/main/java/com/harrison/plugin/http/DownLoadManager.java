@@ -12,7 +12,7 @@ import retrofit2.http.Streaming;
 import retrofit2.http.Url;
 
 /**
- * TODO 封装文件下载
+ * TODO 封装文件下载  待完善
  */
 
 public class DownLoadManager {

@@ -19,7 +19,7 @@ import com.yalantis.ucrop.UCrop
 import java.io.File
 
 /**
- *  处理本地图片获取流程工具
+ *  获取本地图片和相册图片处理流程封装
  */
 class PhotoUtils(context: Context) {
 

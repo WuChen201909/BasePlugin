@@ -15,7 +15,7 @@ import com.harrison.baseplugin.R
  * 自定义loadingView,实现网络状态
  *
  * 使用方式
- *   调用后将会把状态视图填充到屏幕上
+ *   调用后将会把状态视图填充到指定父控件上
  *   LoadingView.fillInLayout(contentView)
  */
 class LoadingView : LinearLayout, View.OnClickListener {

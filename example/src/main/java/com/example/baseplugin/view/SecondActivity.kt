@@ -54,6 +54,14 @@ class SecondActivity : BaseActivityView() {
 
             override fun onBindView(type: Int, view: View, data: Any) {
                 view.findViewById<TextView>(R.id.tv_test).setText(data as String)
+                view.findViewById<TextView>(R.id.tv_test).setOnClickListener {
+                    Log.i("result", "点击文字：" + data)
+                }
+            }
+
+            override fun isFloat(type: Int): Boolean {
+                if(type == 3)return true
+                return super.isFloat(type)
             }
         }
 
@@ -92,17 +100,17 @@ class SecondActivity : BaseActivityView() {
         }
 
         adapter.notifyDataSetChanged(data02 as MutableList<Any>, 2)
+        adapter.notifyDataSetChanged(arrayListOf("测试标题"), 3)
         adapter.notifyDataSetChanged(data as MutableList<Any>, 1)
         adapter.notifyDataSetChanged(data02 as MutableList<Any>, 2)
         adapter.notifyDataSetChanged(data as MutableList<Any>, 1)
+
 
         recyclerview_list.adapter = adapter
         recyclerview_list.layoutManager = LinearLayoutManager(this)
         recyclerview_list.addItemDecoration(CustomItemDecoration())
 
-    }
-
-    class CusttomViewHoler(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        recyclerview_list.floatLayout =   ll_float
 
     }
 
@@ -148,8 +156,7 @@ class SecondActivity : BaseActivityView() {
             state: RecyclerView.State
         ) {
             super.getItemOffsets(outRect, view, parent, state)
-            outRect.top = 20
-
+            outRect.bottom = 10
         }
 
         override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
@@ -162,28 +169,5 @@ class SecondActivity : BaseActivityView() {
 
     }
 
-//    inner class CustomAdapter : RecyclerView.Adapter<CustomAdapter.CustomViewHolder>() {
-//
-//        inner class CustomViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-//             var text = itemView.findViewById<TextView>(R.id.tv_test)
-//        }
-//
-//        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomViewHolder {
-//            var view = LayoutInflater.from(parent.context).inflate(
-//                R.layout.item_test,
-//                parent,
-//                false
-//            )
-//            return CustomViewHolder(view)
-//        }
-//
-//        override fun onBindViewHolder(holder: CustomViewHolder, position: Int) {
-//            holder.text.setText(data[position])
-//        }
-//
-//        override fun getItemCount(): Int {
-//            return data.size
-//        }
-//    }
 
 }

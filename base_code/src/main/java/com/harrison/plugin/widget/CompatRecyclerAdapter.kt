@@ -71,9 +71,8 @@ abstract class CompatRecyclerAdapter : RecyclerView.Adapter<CompatRecyclerAdapte
         return mData[position].type
     }
 
-
     /**
-     * 绑定监听数据
+     *  绑定监听数据
      */
     override fun onBindViewHolder(holder: RowViewHolder, position: Int) {
         var rowData = mData[position]
@@ -195,7 +194,7 @@ abstract class CompatRecyclerAdapter : RecyclerView.Adapter<CompatRecyclerAdapte
      * 自定义控件重写当前函数告诉控当前Item是否悬浮
      *      获取是否浮动
      */
-    open fun isFloat(position: Int): Boolean {
+    open fun isFloat(type: Int): Boolean {
         return false
     }
 
@@ -203,7 +202,7 @@ abstract class CompatRecyclerAdapter : RecyclerView.Adapter<CompatRecyclerAdapte
      * 自定义控件重写当前函数告诉控当前Item是否悬浮
      *      浮动等级
      */
-    open fun floatLevel(position: Int): Int {
+    open fun floatLevel(type: Int): Int {
         return 0
     }
 

@@ -9,12 +9,26 @@
         android:layout_height="wrap_content"
         android:text="这是第二个页面">
     </Button>
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerview_list"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </androidx.recyclerview.widget.RecyclerView>
+        <com.harrison.plugin.widget.CompatRecyclerView
+            android:id="@+id/recyclerview_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </com.harrison.plugin.widget.CompatRecyclerView>
+
+        <LinearLayout
+            android:id="@+id/ll_float"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 
 </com.harrison.plugin.widget.SafeLayout>

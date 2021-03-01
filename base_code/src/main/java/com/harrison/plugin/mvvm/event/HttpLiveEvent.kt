@@ -3,11 +3,11 @@ package com.harrison.plugin.http.event
 import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.LifecycleOwner
-import com.harrison.plugin.mvvm.SingleLiveEvent
+import com.harrison.plugin.mvvm.event.SingleLiveEvent
 import com.harrison.plugin.util.constant.HttpResponseCode
 
 /**
- * 专用于网络请求事件处理
+ * 封装网络请求结果的事件
  */
 class HttpLiveEvent<H> : SingleLiveEvent<HttpLiveEntity<H>>() {
 

@@ -9,8 +9,7 @@ import android.view.animation.TranslateAnimation
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModelProvider
+import com.harrison.plugin.mvvm.event.SingleLiveEvent
 import com.harrison.plugin.util.io.CoroutineUtils
 
 /**

@@ -65,4 +65,7 @@ dependencies {
     implementation group: 'org.apache.lucene', name: 'lucene-core', version: '7.3.0'
 
     api project(path: ':base_code')
+
+    implementation  'com.scwang.smart:refresh-layout-kernel:2.0.3'      //核心必须依赖
+    implementation  'com.scwang.smart:refresh-header-classics:2.0.3'    //经典刷新头
 }

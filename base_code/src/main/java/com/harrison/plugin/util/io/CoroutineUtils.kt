@@ -8,20 +8,24 @@ import kotlinx.coroutines.*
 import org.json.JSONException
 import java.io.IOException
 import java.lang.Exception
+import java.util.concurrent.locks.ReentrantLock
 
 
 /**
  * 携程封装工具类
+ *  1、封装IO线程
+ *  2、封装主线程
+ *  3、封装异步加载视图
+ *  4、封装网络请求加载
+ *  5、封装任务队列
  */
 object CoroutineUtils {
 
-    var exceptionHandler = CoroutineExceptionHandler { _ , throwable ->
+    var exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         LogUtils.printException(throwable)
     }
-    var IOScope: CoroutineScope =
-        CoroutineScope(SupervisorJob() + Dispatchers.IO + exceptionHandler)
-    var mainScope: CoroutineScope =
-        CoroutineScope(SupervisorJob() + Dispatchers.Main + exceptionHandler)
+    var IOScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + exceptionHandler)
+    var mainScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main + exceptionHandler)
 
     /**
      * 切换到 IO 线程操作内容
@@ -47,9 +51,9 @@ object CoroutineUtils {
      *  @param layoutId 布局ID
      *  @param callResult 界面加载成功后的回掉
      */
-    fun launchLayout(context: Context, layoutId:Int, callResult: (result: View) -> Unit) {
+    fun launchLayout(context: Context, layoutId: Int, callResult: (result: View) -> Unit) {
         CoroutineUtils.launchIO {
-            var resultView = LayoutInflater.from(context).inflate(layoutId,null)
+            var resultView = LayoutInflater.from(context).inflate(layoutId, null)
             CoroutineUtils.launchMain {
                 callResult(resultView)
             }
@@ -68,14 +72,16 @@ object CoroutineUtils {
         callResult: (result: T) -> Unit,
         callError: (code: Int, error: String) -> Unit
     ) {
-        var httpExceptionHandler = CoroutineExceptionHandler { _ , throwable ->
+
+        var httpExceptionHandler = CoroutineExceptionHandler { _, throwable ->
             LogUtils.printException(throwable)
             CoroutineUtils.launchMain {
                 callError(-200, "${throwable.message}")
             }
         }
 
-        var httpScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + httpExceptionHandler)
+        var httpScope: CoroutineScope =
+            CoroutineScope(SupervisorJob() + Dispatchers.IO + httpExceptionHandler)
         httpScope.launch {
             try {
                 var re = async()
@@ -99,5 +105,83 @@ object CoroutineUtils {
             }
         }
     }
+
+
+    /**
+     * =============================================================
+     *  任务队列封装
+     * =============================================================
+     */
+    class TaskQueueManager<T> {
+
+        var taskQueue: MutableList<Task<T>> = arrayListOf()
+        var workStatus = false;
+
+        //任务数据结构 ，thread 执行线程类型
+        data class Task<T>(var exest: () -> T, var result: (data: T) -> Unit)
+
+        /**
+         * 添加任务到队列
+         */
+        fun addTask(exest: () -> T, result: (data: T) -> Unit) {
+
+            var task = Task<T>(exest, result)
+            synchronized(taskQueue) {
+                taskQueue.add(task)
+            }
+
+            synchronized(workStatus) {
+                if (workStatus)
+                    return
+                workStatus = true
+            }
+
+            launchIO {
+                while (workStatus) {
+                    var taskItem: Task<T>? = null
+
+                    synchronized(taskQueue) {
+                        if (taskQueue.size <= 0) {
+                            workStatus = false
+                        }
+                        taskItem = taskQueue[0]
+                        taskQueue.removeAt(0)
+                    }
+
+                    if (taskItem == null) {
+                        synchronized(workStatus) {
+                            workStatus = false
+                        }
+                        break
+                    }
+
+                    var result = taskItem!!.exest()
+
+                    launchMain {
+                        taskItem!!.result(result)
+                    }
+
+                }
+            }
+        }
+
+        /**
+         * 移出但前任务队列
+         */
+        fun removeTask(task: Task<T>) {
+            synchronized(taskQueue) {
+                taskQueue.remove(task)
+            }
+        }
+
+        fun clearAllTask() {
+            synchronized(taskQueue) {
+                taskQueue.clear()
+            }
+        }
+
+
+    }
+
 
 }

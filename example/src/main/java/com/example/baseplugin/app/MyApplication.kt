@@ -13,7 +13,7 @@ class MyApplication : Application() {
         LogUtils.init(true,"test_demo")
         LogUtils.i("打印日志")
 
-        Performance.init(this, showFps = true, analyze = true, showFPSLog = false)
+        Performance.init(this, showFps = true, analyze = false, showFPSLog = false)
 
     }
 

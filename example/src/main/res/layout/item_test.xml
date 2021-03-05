@@ -1,13 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="40dp"
-    android:background="@color/teal_700">
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="15dp"
+    android:background="@color/teal_700"
+    >
 
     <TextView
         android:id="@+id/tv_test"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="match_parent"
         android:text="ddd"></TextView>
+
+    <TextView
+        android:id="@+id/tv_test2"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:text="ddd"></TextView>
+
+    <TextView
+        android:id="@+id/tv_test3"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:text="ddd"></TextView>
+
+
 
 </LinearLayout>

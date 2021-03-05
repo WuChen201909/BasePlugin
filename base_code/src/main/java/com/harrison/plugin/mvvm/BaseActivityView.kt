@@ -12,7 +12,10 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.harrison.plugin.mvvm.event.FragmentTaskEvent
 import com.harrison.plugin.util.developer.LogUtils
 import com.harrison.plugin.util.io.CoroutineUtils
@@ -21,7 +24,7 @@ import com.harrison.plugin.util.io.CoroutineUtils
 /**
  * 尽量保持 Android 原生结构，不用范型的方式封装ViewMode的初始化
  * 封装功能
- *      1、浸入式状态栏
+ *      1、固定使用浸入式状态栏，可使用Safelayout作为根布局
  *      2、点击指定空白处自动关闭软键盘
  *
  * 性能优化
@@ -67,6 +70,12 @@ open abstract class BaseActivityView: AppCompatActivity() {
         } else {
             throw Exception("please set view layout on this page")
         }
+    }
+
+    fun <VM : ViewModel> getViewMode(viewModel: Class<VM>):VM{
+        return ViewModelProvider(
+            this, ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+        ).get(viewModel)
     }
 
     /**

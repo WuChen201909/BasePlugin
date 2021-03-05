@@ -7,7 +7,7 @@ import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
 
 
-object  RetrofitManager {
+object  RetrofitManagerImp {
 
     const val DEFAULT_HOST = "http://172.21.34.101:3000"
     private var apiService: ApiServer? = null

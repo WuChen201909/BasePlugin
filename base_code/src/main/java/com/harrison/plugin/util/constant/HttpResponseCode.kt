@@ -21,8 +21,6 @@ object HttpResponseCode {
     const val HTTP_LOCAL_EMPTY = 600
     const val HTTP_LOCAL_DEFAULT_ERROR = 601
 
-
-
     val httpCode = mapOf(
 
         //信息响应

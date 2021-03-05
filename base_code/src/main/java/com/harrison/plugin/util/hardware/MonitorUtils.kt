@@ -12,7 +12,6 @@ object MonitorUtils {
 
     }
 
-
     /**
      * dp转px
      *

@@ -1,31 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:id="@+id/ll_loading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="15dp"
             android:background="@drawable/loading_bg"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="15dp">
+
             <ImageView
                 android:id="@+id/iv_loading"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
 
                 android:layout_gravity="center_horizontal"
-                android:scaleType="fitXY"
                 android:background="@drawable/loading"
-                />
+                android:scaleType="fitXY" />
 
             <TextView
                 android:id="@+id/tv_loading"
@@ -38,24 +37,23 @@
                 android:textSize="15sp"
                 android:textStyle="bold" />
         </LinearLayout>
-        </LinearLayout>
-
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/ll_kong"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
-        android:padding="15dp"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="15dp">
+
         <ImageView
             android:layout_width="123dp"
             android:layout_height="104dp"
             android:layout_gravity="center_horizontal"
-            android:scaleType="fitXY"
             android:background="@mipmap/icon_kongshuju"
-            />
+            android:scaleType="fitXY" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -71,28 +69,28 @@
     <RelativeLayout
         android:id="@+id/rl_error"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/tv_error"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:textColor="#333333"
             android:text="当前网络信号较差，请稍后刷新试试"
+            android:textColor="#333333"
             android:textSize="15sp"
             android:textStyle="bold" />
 
         <ImageView
             android:layout_width="98dp"
             android:layout_height="91dp"
-            android:scaleType="fitXY"
-            android:src="@mipmap/wwl"
-            android:layout_gravity="center_horizontal"
-            android:background="@mipmap/no_network"
             android:layout_above="@+id/tv_error"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="15dp" />
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="15dp"
+            android:background="@mipmap/no_network"
+            android:scaleType="fitXY"
+            android:src="@mipmap/wwl" />
     </RelativeLayout>
 
 </RelativeLayout>

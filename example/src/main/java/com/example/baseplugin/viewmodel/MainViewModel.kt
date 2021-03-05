@@ -3,7 +3,7 @@ package com.example.baseplugin.viewmodel
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import com.example.baseplugin.http.RetrofitManager
+import com.example.baseplugin.http.RetrofitManagerImp
 import com.harrison.plugin.util.constant.HttpResponseCode
 import com.harrison.plugin.http.event.HttpLiveEvent
 import com.harrison.plugin.util.io.CoroutineUtils
@@ -14,7 +14,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun exeTest(){
         CoroutineUtils.launchNetwork<String>({
-            var result =  RetrofitManager.instance().getInformationType()
+            var result =  RetrofitManagerImp.instance().getInformationType()
             Log.i("result","执行结果$result")
             result.toString()
         },{ result ->

@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.baseplugin.R
 import com.example.baseplugin.widget.CustomLayoutManager
 import com.harrison.plugin.mvvm.BaseActivityView
-import com.harrison.plugin.widget.CompatRecyclerAdapter
 import kotlinx.android.synthetic.main.activity_second.*
 
 
@@ -39,37 +38,7 @@ class SecondActivity : BaseActivityView() {
 
     override fun viewCreated() {
 
-        var adapter = object : CompatRecyclerAdapter() {
-            override fun getLayout(type: Int): Int {
-                return R.layout.item_test
-            }
 
-            override fun getColumnCount(type: Int): Int {
-                return if (type == 1) {
-                    3
-                } else {
-                    1
-                }
-            }
-
-            override fun onBindView(type: Int, view: View, data: Any) {
-                view.findViewById<TextView>(R.id.tv_test).setText(data as String)
-                view.findViewById<TextView>(R.id.tv_test).setOnClickListener {
-                    Log.i("result", "点击文字：" + data)
-                }
-            }
-
-            override fun isFloat(type: Int): Boolean {
-                if(type == 3)return true
-                return super.isFloat(type)
-            }
-        }
-
-        adapter.setOnItemClickListener(object : CompatRecyclerAdapter.OnItemClickListener {
-            override fun onItemClick(type: Int, data: Any) {
-                Log.i("result", "点击：" + data)
-            }
-        })
 
 //        var adapter = object: RecyclerView.Adapter<CusttomViewHoler>() {
 //            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CusttomViewHoler {
@@ -99,18 +68,11 @@ class SecondActivity : BaseActivityView() {
             data02.add("标题类数据：" + item)
         }
 
-        adapter.notifyDataSetChanged(data02 as MutableList<Any>, 2)
-        adapter.notifyDataSetChanged(arrayListOf("测试标题"), 3)
-        adapter.notifyDataSetChanged(data as MutableList<Any>, 1)
-        adapter.notifyDataSetChanged(data02 as MutableList<Any>, 2)
-        adapter.notifyDataSetChanged(data as MutableList<Any>, 1)
 
-
-        recyclerview_list.adapter = adapter
-        recyclerview_list.layoutManager = LinearLayoutManager(this)
-        recyclerview_list.addItemDecoration(CustomItemDecoration())
-
-        recyclerview_list.floatLayout =   ll_float
+//        recyclerview_list.layoutManager = LinearLayoutManager(this)
+//        recyclerview_list.addItemDecoration(CustomItemDecoration())
+//
+//        recyclerview_list.floatLayout =   ll_float
 
     }
 

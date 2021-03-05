@@ -41,16 +41,19 @@ class LoadingView : LinearLayout, View.OnClickListener {
         fun fillInLayout(layout: ViewGroup): LoadingView {
             // 获取指定控件的父控件
             var parent: ViewGroup = layout.parent as ViewGroup
+
+            var index =  parent.indexOfChild(layout) //
             parent.removeView(layout) //将控件本身移除
+
             //添加一个容器控件 为了方便加载视图压在内容上方
             var contentView = FrameLayout(layout.context)
-            var contentLayoutParam = ViewGroup.LayoutParams(
+            contentView.layoutParams = layout.layoutParams
+            layout.layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
-            contentView.layoutParams = contentLayoutParam
-            //添加回内容到容器
             contentView.addView(layout)
+            
             //添加加载视图到容器
             val loadingView = LoadingView(layout.context)
             val layoutParams: ViewGroup.LayoutParams = LayoutParams(
@@ -60,7 +63,7 @@ class LoadingView : LinearLayout, View.OnClickListener {
             loadingView.layoutParams = layoutParams
             contentView.addView(loadingView)
 
-            parent.addView(contentView)
+            parent.addView(contentView,index)
 
             return loadingView
         }
@@ -136,7 +139,6 @@ class LoadingView : LinearLayout, View.OnClickListener {
         }
 
         this.status = status
-
     }
 
     override fun onClick(v: View) {

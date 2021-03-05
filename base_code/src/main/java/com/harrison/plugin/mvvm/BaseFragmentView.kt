@@ -9,6 +9,8 @@ import android.view.animation.TranslateAnimation
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.harrison.plugin.mvvm.event.SingleLiveEvent
 import com.harrison.plugin.util.io.CoroutineUtils
 
@@ -75,6 +77,12 @@ open abstract class BaseFragmentView : Fragment() {
         fragmentViewContent.addView(view)
     }
 
+    fun <VM : ViewModel> getViewMode(viewModel: Class<VM>):VM{
+        return ViewModelProvider(
+            this, ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+        ).get(viewModel)
+    }
+
     /**
      * ====================================================
      *  Fragment 堆栈管理
@@ -107,6 +115,7 @@ open abstract class BaseFragmentView : Fragment() {
     fun newNavigator(fragment: Fragment,isAnimation:Boolean = true){
         this.newNavigator(fragment, null,isAnimation)
     }
+
     fun newNavigator(fragment: Fragment, bundle: Bundle?,isAnimation:Boolean = true){
         if (requireActivity() is BaseActivityView) {
             (requireActivity() as BaseActivityView).newNavigator(fragment, bundle,isAnimation)

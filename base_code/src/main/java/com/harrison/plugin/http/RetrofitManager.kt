@@ -4,7 +4,9 @@ package com.harrison.plugin.http
 import com.harrison.plugin.http.convert.GsonConverterFactory
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
+import java.security.SecureRandom
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.SSLContext
 
 /**
  *
@@ -38,6 +40,20 @@ abstract class RetrofitManager<T> {
             .callTimeout(15, TimeUnit.SECONDS)
             .readTimeout(15, TimeUnit.SECONDS)
             .addInterceptor(LogInterceptor())
+
+        if(trushAllCertification()){
+            var sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, arrayOf(HttpsUtils.UnSafeTrustManager), SecureRandom())
+            build.sslSocketFactory(sslContext.getSocketFactory(),HttpsUtils.UnSafeTrustManager)
+            build.hostnameVerifier(HttpsUtils.UnSafeHostnameVerifier)
+        }
+    }
+
+    /**
+     * 信任所有证书
+     */
+    public open fun trushAllCertification():Boolean{
+        return  false
     }
 
     /**

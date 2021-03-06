@@ -1,8 +1,11 @@
 package com.example.baseplugin.http
 
 import com.google.gson.JsonObject
-import retrofit2.http.GET
-import retrofit2.http.Query
+import okhttp3.RequestBody
+import retrofit2.http.Body
+import retrofit2.http.Header
+import retrofit2.http.Headers
+import retrofit2.http.POST
 
 interface ApiServer {
     /**
@@ -11,7 +14,13 @@ interface ApiServer {
      * type=2篮球
      * type=""查全部
      */
-    @GET("http://172.21.34.101:3000/app/info")
-    suspend fun getInformationType(): JsonObject
+    @POST("/zh-cn/serv/getmenu")
+    @Headers(
+        *arrayOf(
+            "Referer: https://site5.hnzae.com"
+        )
+    )
+    suspend fun getInformationType(@Header("Cookie") cookie: String, @Body route: RequestBody): JsonObject
+
 
 }

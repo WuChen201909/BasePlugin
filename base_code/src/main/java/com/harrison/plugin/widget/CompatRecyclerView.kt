@@ -117,17 +117,25 @@ class CompatRecyclerView @JvmOverloads constructor(
                 }
             }
 
-            //再将 firstShowPosition 以后的的悬浮窗添加到列表
-            var lastShowPosition = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+            Log.i("result","firstShowPosition 以前添加的悬浮窗有  "+newFloatDescribeList.size +" 个")
+
+            // 再将 firstShowPosition 以后的的悬浮窗添加到列表
+//            var lastShowPosition = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+            var currentVisibilityCount = 0
             do {
-                var showPosition = getCoveredVisibilitedPosition(tempCovertHeight)
+                var visibilityView = getChildAt(currentVisibilityCount) // 表示可以被看到的视图
+                var showPosition = getChildAdapterPosition(visibilityView)
+                Log.i("result","检测首个悬浮窗后的控件："+currentVisibilityCount+"  "+tempCovertHeight)
                 var type = mAdapter.getItemViewType(showPosition)
                 if(mAdapter.isFloat(type)){
                     tempCovertHeight = addFloatDescribe(
                         newFloatDescribeList,
-                        FloatDescribeItem(showPosition, mAdapter.floatLevel(type)),)
+                        FloatDescribeItem(showPosition, mAdapter.floatLevel(type)),visibilityView)
                 }
-            } while (mAdapter.isFloat(type)&&lastShowPosition>showPosition)  // 只要是浮动窗口就要继续添加,且只检测窗口显示中的内容
+
+                currentVisibilityCount ++
+                Log.i("result","最终高度对比："+visibilityView.top+"  "+tempCovertHeight)
+            } while (visibilityView.top < tempCovertHeight)  // 只要是浮动窗口就要继续添加,且只检测窗口显示中的内容
 
             Log.i("result", "=======  当前浮窗显示内容顺序  ======= ")
             for (item in newFloatDescribeList) {
@@ -173,12 +181,15 @@ class CompatRecyclerView @JvmOverloads constructor(
                     lastDes = flostDesList.last()
                 }
             }
+            if(flostDesList.size == 0 || flostDesList.last().position != describeItem.position){
+                var mAdapter = adapter as CompatAdapter
 
-            var mAdapter = adapter as CompatAdapter
-            var viewHolder = mAdapter.createViewHolder(floatLayout!!,mAdapter.getItemViewType(describeItem.position))
-            mAdapter.onBindViewHolder(viewHolder,describeItem.position)
-            describeItem.view = viewHolder.itemView
-            flostDesList.add(describeItem)
+                var viewHolder = mAdapter.createViewHolder(floatLayout!!,mAdapter.getItemViewType(describeItem.position))
+                mAdapter.onBindViewHolder(viewHolder,describeItem.position)
+                viewHolder.itemView.measure(viewHolder.itemView.layoutParams.width,viewHolder.itemView.layoutParams.height)
+                describeItem.view = viewHolder.itemView
+                flostDesList.add(describeItem)
+            }
 
             var covertHeight = 0
             for (item in flostDesList){
@@ -192,22 +203,22 @@ class CompatRecyclerView @JvmOverloads constructor(
             return covertHeight
         }
 
-        /**
-         * 获取悬浮窗覆盖后的可见位置
-         */
-        fun getCoveredVisibilitedPosition(covertHeight: Int): Int {
-            var plushCount = 0
-            var visibilityView: View? = null
-            while (plushCount < childCount) {
-                visibilityView = getChildAt(plushCount) // 表示可以被看到的视图
-                if (visibilityView.top + visibilityView.height > covertHeight) { // 表示视图没有被悬浮窗盖住
-                    break
-                }
-                plushCount++
-            }
-            var showPosition = getChildAdapterPosition(visibilityView!!)
-            return showPosition
-        }
+//        /**
+//         * 获取悬浮窗覆盖后的可见位置
+//         */
+//        fun getCoveredVisibilitedPosition(covertHeight: Int): Int {
+//            var plushCount = 0
+//            var visibilityView: View? = null
+//            while (plushCount < childCount) {
+//                visibilityView = getChildAt(plushCount) // 表示可以被看到的视图
+//                if (visibilityView.top + visibilityView.height > covertHeight) { // 表示视图没有被悬浮窗盖住
+//                    break
+//                }
+//                plushCount++
+//            }
+//            var showPosition = getChildAdapterPosition(visibilityView!!)
+//            return showPosition
+//        }
 
         /**
          * 将原列表和当前列表不相同的部分删除
@@ -240,11 +251,11 @@ class CompatRecyclerView @JvmOverloads constructor(
                 oldList.removeLast()
             }
 
-//            Log.i("result", "=======  删除不同后的老列表  ======= ")
-//            for (item in oldList){
-//                Log.i("result", "==== "+item.position +"   "+item.level)
-//            }
-//            Log.i("result", "========================== ")
+            Log.i("result", "=======  删除不同后的老列表  ======= ")
+            for (item in oldList){
+                Log.i("result", "==== "+item.position +"   "+item.level)
+            }
+            Log.i("result", "========================== ")
         }
 
         /**
@@ -257,6 +268,11 @@ class CompatRecyclerView @JvmOverloads constructor(
                 floatLayout!!.addView(currentDescribe.view)
                 floatDescribeList.add(currentDescribe)
             }
+            Log.i("result", "=======  追加后的列表  ======= "+floatLayout?.childCount)
+            for (item in floatDescribeList){
+                Log.i("result", "==== "+item.position +"   "+item.level)
+            }
+            Log.i("result", "========================== ")
         }
     }
 

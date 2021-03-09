@@ -1,10 +1,12 @@
 package com.harrison.plugin.widget
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,18 +28,26 @@ class CompatRecyclerView @JvmOverloads constructor(
      * 吸顶效果
      * ============================================================
      */
-    var floatLayout: LinearLayout? = null
-
-    /**
-     * 吸顶部分的高度
-     */
-    var covertHeight: Int = 0
+    var floatLayout: FrameLayout? = null
 
     //悬浮窗列表
     var floatDescribeList: MutableList<FloatDescribeItem> = arrayListOf()
 
-    inner class FloatDescribeItem(var position: Int, var level: Int, var view: View? = null)
-
+    /**
+     * 悬浮控件描述对象
+     *  position  表示悬浮对象在数据中的位置
+     *  level     悬浮控件等级
+     *  height    悬浮控件的高度
+     *  padding   悬浮控件的顶部边距
+     *  view      悬浮控件本身
+     */
+    inner class FloatDescribeItem(
+        var position: Int,
+        var level: Int,
+        var height: Int,
+        var top: Int,
+        var view: View? = null
+    )
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -56,7 +66,6 @@ class CompatRecyclerView @JvmOverloads constructor(
 
         }
 
-
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             if (floatLayout == null
                 && adapter is CompatAdapter
@@ -64,29 +73,34 @@ class CompatRecyclerView @JvmOverloads constructor(
             ) {
                 return
             }
-
+            // 找到当前层级最高级应该显示的位置
             var startPosition = findHightLevelPosition()
-            var newFloatDescribeList: MutableList<FloatDescribeItem> =
-                getNewFloatDescribeList(startPosition)
+
+            //获取当前悬浮窗描述列表
+            var newFloatDescribeList: MutableList<FloatDescribeItem> = getNewFloatDescribeList(startPosition)
+
+            //删除与新描述列表不同的部分
             clearOldDefferentDescribe(floatDescribeList, newFloatDescribeList)
+
+            //添加新的描述列表中的悬浮控件
             addNewFloatLayout(newFloatDescribeList)
         }
 
         /**
-         * 找到当前悬浮窗顶级所在的position
+         * 找到当前悬浮窗顶级所在的 position
          *  @return 返回找到的位置
          */
         fun findHightLevelPosition(): Int {
             var position = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-            var hightLevel = 1000
+            var hightLevel = Int.MAX_VALUE  //等级值越大表示等级越低，先设置为最低等级依次往上找
             var mAdapter = adapter as CompatAdapter
             for (index in position downTo 0) {
                 var type = mAdapter.getItemViewType(index)
-                if (mAdapter.isFloat(type)) {  // 浮动控件
+                if (mAdapter.isFloat(type)) {  // 找到浮动窗口则开始判断
                     var currentLevel = mAdapter.floatLevel(type)
-                    if (hightLevel < currentLevel) {  // 找到更高等级浮动控件
+                    if (hightLevel < currentLevel) {         // 找到比当前等级高的控件
                         hightLevel = currentLevel
-                    } else if (hightLevel < currentLevel // 找到低于当前等级的浮动控件，表示找到当前分组最高等级
+                    } else if (hightLevel <= currentLevel   // 找到低于当前等级的浮动控件，表示找到当前分组最高等级
                         || currentLevel == 0
                     ) {
                         return index
@@ -96,129 +110,174 @@ class CompatRecyclerView @JvmOverloads constructor(
             return 0
         }
 
-
         /**
          * 获取当前最新的浮动窗口列表描述
+         *      1、先添加显示区以外的描述列表
+         *      2、再添加显示区中的描述列表
          */
-        fun getNewFloatDescribeList(startPosition: Int): MutableList<FloatDescribeItem> {
+        fun getNewFloatDescribeList(
+            startPosition: Int
+        ): MutableList<FloatDescribeItem> {
 
             var mAdapter = adapter as CompatAdapter
-            var newFloatDescribeList: MutableList<FloatDescribeItem> = arrayListOf() //新列表
+            var newFloatDescribeList: MutableList<FloatDescribeItem> = arrayListOf()    //新列表
             var tempCovertHeight = 0
 
             //先将 firstShowPosition 以外的悬浮窗添加到列表
-            var firstShowPosition = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+            var firstShowPosition =
+                (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
             for (currentPosition in startPosition..firstShowPosition) {
                 var type = mAdapter.getItemViewType(currentPosition)
                 if (mAdapter.isFloat(type)) {
-                    tempCovertHeight = addFloatDescribe(
-                        newFloatDescribeList,
-                        FloatDescribeItem(currentPosition, mAdapter.floatLevel(type)))
+                    tempCovertHeight =
+                        addFloatDescribe(
+                            newFloatDescribeList,
+                            currentPosition,
+                            mAdapter.floatLevel(type)
+                        )
                 }
             }
-
-            Log.i("result","firstShowPosition 以前添加的悬浮窗有  "+newFloatDescribeList.size +" 个")
 
             // 再将 firstShowPosition 以后的的悬浮窗添加到列表
-//            var lastShowPosition = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
             var currentVisibilityCount = 0
-            do {
-                var visibilityView = getChildAt(currentVisibilityCount) // 表示可以被看到的视图
+            while (true) {
+                // 依次处理显示区域的视图
+                var visibilityView = getChildAt(currentVisibilityCount)
                 var showPosition = getChildAdapterPosition(visibilityView)
-                Log.i("result","检测首个悬浮窗后的控件："+currentVisibilityCount+"  "+tempCovertHeight)
-                var type = mAdapter.getItemViewType(showPosition)
-                if(mAdapter.isFloat(type)){
-                    tempCovertHeight = addFloatDescribe(
-                        newFloatDescribeList,
-                        FloatDescribeItem(showPosition, mAdapter.floatLevel(type)),visibilityView)
+                currentVisibilityCount++
+
+                if (newFloatDescribeList.size != 0 && showPosition == newFloatDescribeList.last().position) {
+                    continue
                 }
 
-                currentVisibilityCount ++
-                Log.i("result","最终高度对比："+visibilityView.top+"  "+tempCovertHeight)
-            } while (visibilityView.top < tempCovertHeight)  // 只要是浮动窗口就要继续添加,且只检测窗口显示中的内容
+                if (visibilityView.top >= tempCovertHeight) {
+                    break
+                }
 
-            Log.i("result", "=======  当前浮窗显示内容顺序  ======= ")
-            for (item in newFloatDescribeList) {
-                Log.i("result", "==== " + item.position + "   " + item.level)
+                var type = mAdapter.getItemViewType(showPosition)
+
+                if (mAdapter.isFloat(type)) {
+                    tempCovertHeight = addFloatDescribe(
+                        newFloatDescribeList,
+                        showPosition, mAdapter.floatLevel(type), visibilityView
+                    )
+                }
             }
-            Log.i("result", "========================== ")
+
             return newFloatDescribeList
         }
 
-        /*
-        for (currentPosition in startPosition..firstPosition) {
-                var type = mAdapter.getItemViewType(currentPosition)
-                if (mAdapter.isFloat(type)) {                   // 是悬浮控件
-                    var currentLevel = mAdapter.floatLevel(type)
-                    Log.i("result", "悬浮等级：" + currentLevel)
-                    while (newFloatDescribeList.size > 0) {         //回退到当前等级应该显示的数据
-                        var lastFloatDescribe = newFloatDescribeList.last()
-                        if (lastFloatDescribe == null || currentLevel > lastFloatDescribe.level || lastFloatDescribe.level == 0) {
-                            break
-                        }
-                        newFloatDescribeList.removeLast()
-                    }
-                    newFloatDescribeList.add(FloatDescribeItem(currentPosition, currentLevel))
-                }
-            }
-         */
-
         /**
          * 添加一个浮动描述
-         *  如果添加成功则返回添加浮动窗口的高度
-         *  @param showView 如果添加的悬浮窗已经显示到窗口中则将窗口传递到当前函数用于判断
+         *  @param  showView 如果添加的悬浮窗已经显示到窗口中则将窗口传递到当前函数用于判断
+         *  @return 返回当前描述列表应该显示的高度
          */
         fun addFloatDescribe(
             flostDesList: MutableList<FloatDescribeItem>,
-            describeItem: FloatDescribeItem,showView:View? = null
+            position: Int, level: Int, showView: View? = null
         ): Int {
+            var mAdapter = adapter as CompatAdapter
 
-            if(flostDesList.size != 0 && showView == null){  //如果是添加显示区以外的等级直接删除低于等于当前等级的悬浮窗然后追加
-                var lastDes = flostDesList.last()
-                while(describeItem.level <= lastDes.level){
-                    flostDesList.removeLast()
-                    if(flostDesList.size == 0 )break
-                    lastDes = flostDesList.last()
+            var lastTop = if (flostDesList.size == 0) {
+                0
+            } else {
+                flostDesList.last().top + flostDesList.last().height
+            }
+
+            var consume = false
+            var index = 0
+            while (flostDesList.size > 0 && flostDesList.size > index) {
+                var item = flostDesList[index]
+
+                if (item.position == position) continue //
+
+                if (level <= item.level) {      // 找到等级不相同的情况
+                    if (showView == null) {     // 显示区以外
+                        //删除所有当前位置的控件
+                        while (flostDesList.size > index) {
+                            flostDesList.removeLast()
+                        }
+                        lastTop = if (flostDesList.size == 0) {
+                            0
+                        } else {
+                            flostDesList.last().top + flostDesList.last().height
+                        }
+                        //追加描述
+                        var type = mAdapter.getItemViewType(position)
+                        flostDesList.add(
+                            FloatDescribeItem(
+                                position,
+                                level,
+                                mAdapter.getItemHeight(type),
+                                lastTop
+                            )
+                        )
+                        consume = true
+                        break
+                    } else {       //显示区中
+
+                        var overlapHeight = showView.top - lastTop // 折叠高度
+//                        Log.e("result", "折叠高度计算：" + overlapHeight)
+                        if (overlapHeight >= 0) {
+                            throw Exception("追加不应该追加的数据  " + showView.top + "  ")
+                        }
+
+                        // 调整因为折叠造成的位移
+                        var tempIndex = index
+                        var lastBottom =
+                            if (index == 0) 0 else flostDesList[index - 1].top + flostDesList[index - 1].height
+                        while (flostDesList.size > tempIndex) {
+                            flostDesList[tempIndex].top += overlapHeight
+                            if (lastBottom != 0 && flostDesList[tempIndex].top + flostDesList[tempIndex].height < lastBottom) {
+                                flostDesList[tempIndex].top = lastBottom - flostDesList[tempIndex].height
+                                break
+                            }
+                            tempIndex++
+                        }
+
+
+                        lastTop = if (flostDesList.size == 0) {
+                            0
+                        } else {
+                            flostDesList.last().top + flostDesList.last().height
+                        }
+                        //追加描述
+                        var type = mAdapter.getItemViewType(position)
+                        flostDesList.add(
+                            FloatDescribeItem(
+                                position,
+                                level,
+                                mAdapter.getItemHeight(type),
+                                lastTop
+                            )
+                        )
+                        consume = true
+                        break
+                    }
                 }
-            }
-            if(flostDesList.size == 0 || flostDesList.last().position != describeItem.position){
-                var mAdapter = adapter as CompatAdapter
 
-                var viewHolder = mAdapter.createViewHolder(floatLayout!!,mAdapter.getItemViewType(describeItem.position))
-                mAdapter.onBindViewHolder(viewHolder,describeItem.position)
-                viewHolder.itemView.measure(viewHolder.itemView.layoutParams.width,viewHolder.itemView.layoutParams.height)
-                describeItem.view = viewHolder.itemView
-                flostDesList.add(describeItem)
+                index++
             }
 
-            var covertHeight = 0
-            for (item in flostDesList){
-                covertHeight+= item.view!!.layoutParams!!.height
+            // 表示当前列表中的等级都高于当前等级，直接追加浮动窗口描述
+            if (!consume) {
+                var type = mAdapter.getItemViewType(position)
+                flostDesList.add(
+                    FloatDescribeItem(
+                        position,
+                        level,
+                        mAdapter.getItemHeight(type),
+                        lastTop
+                    )
+                )
             }
 
-            if(showView != null){
-                covertHeight = if(showView.top<covertHeight) showView.top else covertHeight
-            }
+            var covertHeight =
+                if (flostDesList.size == 0) 0 else (flostDesList.last().top + flostDesList.last().height)
 
             return covertHeight
         }
 
-//        /**
-//         * 获取悬浮窗覆盖后的可见位置
-//         */
-//        fun getCoveredVisibilitedPosition(covertHeight: Int): Int {
-//            var plushCount = 0
-//            var visibilityView: View? = null
-//            while (plushCount < childCount) {
-//                visibilityView = getChildAt(plushCount) // 表示可以被看到的视图
-//                if (visibilityView.top + visibilityView.height > covertHeight) { // 表示视图没有被悬浮窗盖住
-//                    break
-//                }
-//                plushCount++
-//            }
-//            var showPosition = getChildAdapterPosition(visibilityView!!)
-//            return showPosition
-//        }
 
         /**
          * 将原列表和当前列表不相同的部分删除
@@ -228,7 +287,7 @@ class CompatRecyclerView @JvmOverloads constructor(
             newList: MutableList<FloatDescribeItem>
         ) {
 
-            //老列表数量多余新列表表时移除老列表多出部分
+            // 老列表数量多余新列表表时移除老列表多出部分
             while (oldList.size > newList.size) {
                 var lastDes = oldList.last()
                 floatLayout?.removeView(lastDes.view)
@@ -251,11 +310,6 @@ class CompatRecyclerView @JvmOverloads constructor(
                 oldList.removeLast()
             }
 
-            Log.i("result", "=======  删除不同后的老列表  ======= ")
-            for (item in oldList){
-                Log.i("result", "==== "+item.position +"   "+item.level)
-            }
-            Log.i("result", "========================== ")
         }
 
         /**
@@ -263,16 +317,30 @@ class CompatRecyclerView @JvmOverloads constructor(
          */
         fun addNewFloatLayout(newList: MutableList<FloatDescribeItem>) {
             var mAdapter = adapter as CompatAdapter
+
+            //追加悬浮视图
             while (floatDescribeList.size != newList.size) {
                 var currentDescribe = newList[floatDescribeList.size]
+                var type = mAdapter.getItemViewType(currentDescribe.position)
+
+                var vewHolder = mAdapter.createViewHolder(floatLayout!!, type)
+                mAdapter.bindViewHolder(vewHolder, currentDescribe.position)
+                vewHolder.itemView.z = -floatDescribeList.size.toFloat()
+
+                currentDescribe.view = vewHolder.itemView
                 floatLayout!!.addView(currentDescribe.view)
                 floatDescribeList.add(currentDescribe)
             }
-            Log.i("result", "=======  追加后的列表  ======= "+floatLayout?.childCount)
-            for (item in floatDescribeList){
-                Log.i("result", "==== "+item.position +"   "+item.level)
+
+            //移动到指定位置
+            for (index in 0 until floatDescribeList!!.size) {
+                var itemView = floatDescribeList[index].view
+
+                var layoutParame = itemView!!.layoutParams as FrameLayout.LayoutParams
+                layoutParame.topMargin = newList[index].top
+                itemView.layoutParams = layoutParame
+
             }
-            Log.i("result", "========================== ")
         }
     }
 
@@ -315,6 +383,11 @@ class CompatRecyclerView @JvmOverloads constructor(
          */
 
         /**
+         * 重写指定 Item高度,首次加载高度不影响尺寸变换动画
+         */
+        abstract fun getItemHeight(type: Int): Int
+
+        /**
          * 自定义控件重写当前函数告诉控当前Item是否悬浮
          *      获取是否浮动
          */
@@ -330,6 +403,7 @@ class CompatRecyclerView @JvmOverloads constructor(
             return 0
         }
 
+
     }
 
     /**
@@ -339,7 +413,7 @@ class CompatRecyclerView @JvmOverloads constructor(
      */
     abstract class CompatViewHolder(
         context: Context,
-        var type: Int
+        var type: Int, var initHeight: Int
     ) :
         RecyclerView.ViewHolder(creatItemView(context)) {
         var cacheData: Any? = null
@@ -361,8 +435,7 @@ class CompatRecyclerView @JvmOverloads constructor(
         init {
             itemView as LinearLayout
             //设置Item的高度
-            itemView.layoutParams.height =
-                (context.resources.displayMetrics.density * getItemHeight(type)).toInt()
+            itemView.layoutParams.height = initHeight
 
             var contentView = getItemLayout(type)
             if (contentView is View) {
@@ -371,7 +444,11 @@ class CompatRecyclerView @JvmOverloads constructor(
                 viewCreated()
             } else if (contentView is Int) {
                 CoroutineUtils.launchLayout(itemView.context, contentView, {
-                    it.layoutParams = itemView.layoutParams
+                    it.layoutParams =
+                        LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
                     itemView.addView(it)
                     initView = true
                     viewCreated()
@@ -382,10 +459,6 @@ class CompatRecyclerView @JvmOverloads constructor(
             }
         }
 
-        /**
-         * 重写指定 Item高度,首次加载高度不影响尺寸变换动画
-         */
-        abstract fun getItemHeight(type: Int): Int
 
         /**
          * 确定加载布局
@@ -411,6 +484,7 @@ class CompatRecyclerView @JvmOverloads constructor(
 
         /**
          * 刷新视图
+         *
          */
         fun refreshView() {
             if (!initView || cacheData == null) {

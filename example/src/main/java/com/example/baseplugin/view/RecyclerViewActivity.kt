@@ -8,8 +8,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatButton
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.baseplugin.R
@@ -50,6 +52,11 @@ class RecyclerViewActivity : BaseActivityView() {
             }
             data.add((CustomData(2, 2, "${dItem} 二级浮动窗口")))
 
+            for (item in 0..5) {
+                data.add((CustomData(0, 0, "测试数据:" + item)))
+            }
+            data.add((CustomData(2, 2, "${dItem} 二级浮动窗口")))
+
             for (item in 0..9) {
                 data.add((CustomData(0, 0, "测试数据:" + item)))
             }
@@ -67,6 +74,17 @@ class RecyclerViewActivity : BaseActivityView() {
         recyclerview_new.setItemAnimator(FlyAnimator())
         recyclerview_new.floatLayout = ll_float
 
+
+//        var btn = AppCompatButton(this)
+//        var parameter = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,FrameLayout.LayoutParams.WRAP_CONTENT)
+//        parameter.topMargin = 120
+//        btn.layoutParams = parameter
+//
+//        ll_float.addView(btn)
+//
+//
+//        parameter.topMargin = 420
+
 //        var intent = Intent(this,SecondActivity::class.java)
 //        startActivity(intent)
 //        finish()
@@ -79,7 +97,7 @@ class RecyclerViewActivity : BaseActivityView() {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomViewHolder {
-            return CustomViewHolder(parent.context, viewType);
+            return CustomViewHolder(parent.context, viewType,getItemHeight(viewType));
         }
 
         override fun getItemCount(): Int {
@@ -104,11 +122,14 @@ class RecyclerViewActivity : BaseActivityView() {
             }
         }
 
+        override fun getItemHeight(type: Int): Int {
+            return (19*this@RecyclerViewActivity.resources.displayMetrics.density).toInt()
+        }
     }
 
-    class CustomViewHolder(context: Context, type: Int) : CompatRecyclerView.CompatViewHolder(
+    class CustomViewHolder(context: Context, type: Int,initHeight:Int) : CompatRecyclerView.CompatViewHolder(
         context,
-        type
+        type,initHeight
     ) {
 
         lateinit var item1: TextView
@@ -123,9 +144,6 @@ class RecyclerViewActivity : BaseActivityView() {
             }
         }
 
-        override fun getItemHeight(type: Int): Int {
-            return 19
-        }
 
         override fun getItemLayout(type: Int): Any {
             return R.layout.item_test

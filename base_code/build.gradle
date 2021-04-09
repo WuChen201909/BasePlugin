@@ -2,7 +2,6 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
 }
-apply from: "base_dependen.gradle"
 
 android {
     compileSdkVersion 30
@@ -39,36 +38,47 @@ android {
     }
 }
 
-//dependencies {
-//
-//    //主要用户对老版本的兼容
-//    api 'androidx.appcompat:appcompat:1.2.0'
-//    api 'androidx.core:core-ktx:1.3.2'
-//    //Java和Kotlin混合开发
-//    api "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-//    //Material风格控件
-//    api 'com.google.android.material:material:1.2.1'
-//
-//    //数据编解码
-//    api 'com.google.code.gson:gson:2.8.6'
-//
-//    //网络全家桶
-//    api "com.squareup.okhttp3:okhttp:4.9.0"
-//    api 'com.squareup.retrofit2:retrofit:2.9.0'
-//
-//    //异步处理方案
-//    api 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9'
-//
-//    //本地事件分发
-//    api 'org.greenrobot:eventbus:3.2.0'
-//
-//    //图片加载
-//    api("io.coil-kt:coil:1.0.0")//加载图片
-//    api("io.coil-kt:coil-gif:1.0.0")//显示gif
-//
-//
-////    testImplementation 'junit:junit:4.13.1'
-////    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-////    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-//
-//}
+
+dependencies {
+// Java和Kotlin混合开发
+    api "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    api 'androidx.core:core-ktx:1.3.2'
+
+
+
+    // 主要用户对老版本的兼容
+    api 'androidx.appcompat:appcompat:1.2.0'
+
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+
+    // Material风格控件
+    api 'com.google.android.material:material:1.2.1'
+
+    // 数据编解码
+    api 'com.google.code.gson:gson:2.8.6'
+
+    // 网络全家桶
+    api "com.squareup.okhttp3:okhttp:4.9.0"
+    api 'com.squareup.retrofit2:retrofit:2.9.0'
+
+    // 异步处理方案
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9'
+
+
+    //本地事件分发
+    api 'org.greenrobot:eventbus:3.2.0'
+
+    //图片加载
+    api("io.coil-kt:coil:1.0.0")//加载图片
+    api("io.coil-kt:coil-gif:1.0.0")//显示gif
+
+    //图片裁剪
+    implementation 'com.github.yalantis:ucrop:2.2.6'
+
+
+//    testImplementation 'junit:junit:4.13.1'
+//    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+//    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+}

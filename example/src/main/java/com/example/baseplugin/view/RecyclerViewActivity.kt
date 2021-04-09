@@ -144,25 +144,14 @@ class RecyclerViewActivity : BaseActivityView() {
             }
         }
 
-
         override fun getItemLayout(type: Int): Any {
             return R.layout.item_test
         }
-
-//        var handler= object :Handler(Looper.myLooper()!!){
-//            override fun handleMessage(msg: Message) {
-//                super.handleMessage(msg)
-//            }
-//        }
 
         override fun viewCreated() {
             super.viewCreated()
             item1 = itemView.findViewById<TextView>(R.id.tv_test)
             item1.setOnClickListener(onClick)
-//            item2 = itemView.findViewById<TextView>(R.id.tv_test2)
-//            item2.setOnClickListener(onClick)
-//            item3 = itemView.findViewById<TextView>(R.id.tv_test3)
-//            item3.setOnClickListener(onClick)
         }
 
         override fun onBindViewData(type: Int, itemView: View, data: Any) {
@@ -170,29 +159,6 @@ class RecyclerViewActivity : BaseActivityView() {
             var rowData: CustomData = data as CustomData
             item1.text = rowData.data
 
-//            if (rowData.data.size > 0) {
-//                item1.text = rowData.data[0] as String
-//                item1.tag = rowData.data[0]
-//                item1.visibility = View.VISIBLE
-//            } else {
-//                item1.visibility = View.INVISIBLE
-//            }
-//
-//            if (rowData.data.size > 1) {
-//                item2.text = rowData.data[1] as String
-//                item2.tag = rowData.data[1]
-//                item2.visibility = View.VISIBLE
-//            } else {
-//                item2.visibility = View.INVISIBLE
-//            }
-//
-//            if (rowData.data.size > 2) {
-//                item3.text = rowData.data[2] as String
-//                item3.tag = rowData.data[2]
-//                item3.visibility = View.VISIBLE
-//            } else {
-//                item3.visibility = View.INVISIBLE
-//            }
         }
 
     }

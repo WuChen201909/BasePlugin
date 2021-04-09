@@ -1004,6 +1004,7 @@ object BitmapUtils {
     fun bitmapToDrawable(bitmap: Bitmap?): Drawable {
         return BitmapDrawable(bitmap)
     }
+
     /**
      * ===================================================================
      * 获取图片信息

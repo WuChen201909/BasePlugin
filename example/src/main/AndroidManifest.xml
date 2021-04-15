@@ -23,13 +23,16 @@
 
         </activity>
         <activity android:name=".view.RecyclerViewActivity">
+
+        </activity>
+        <activity android:name=".view.OneActivity">
+
+        </activity>
+        <activity android:name="com.ym.floattopwidget.FloatTopActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity android:name=".view.OneActivity">
-
         </activity>
     </application>
 

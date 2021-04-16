@@ -127,15 +127,16 @@ class FloatTopWidget @JvmOverloads constructor(
      */
     private fun frontAddView(pos: Int) {
         var position = pos
-        while (position > 0) {
+        while (position >= 0) {
             //  只处理浮动窗口
             var currentLevel = floatViewAdapter!!.getLevelByPosition(position)
 
             if (currentLevel >= 0) {
                 // 列表为空时和发现更高等级的悬浮窗时追加
                 if (tempFloatStack.isEmpty() || tempFloatStack.first().level > currentLevel) {
-                    if(tempFloatStack.isNotEmpty())
-                    Log.e("result","前查追加：${tempFloatStack.first().level} > $currentLevel")
+                    if(tempFloatStack.isNotEmpty()){
+                        Log.e("result","前查追加：${tempFloatStack.first().level} > $currentLevel")
+                    }
                     tempFloatStack.add(
                         0,
                         FloatDescribeView(
